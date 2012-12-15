@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+    <dependency interface="zibo\core\build\handler\FileHandler" class="zibo\core\build\handler\DefaultFileHandler" id="default" />
+    
+    <dependency interface="zibo\core\build\handler\FileHandler" class="zibo\core\build\handler\ConfigIniFileHandler" id="config.ini" />
+    
+    <dependency interface="zibo\core\build\handler\FileHandler" class="zibo\core\build\handler\XmlFileHandler" id="config.xml" />
+    
+    <dependency interface="zibo\core\build\handler\DirectoryHandler" class="zibo\core\build\handler\DefaultDirectoryHandler" id="default" />
+
+    <dependency interface="zibo\core\build\handler\DirectoryHandler" class="zibo\core\build\handler\ExtensionDirectoryHandler" id="config">
+        <call method="__construct">
+            <argument name="defaultFileHandler" type="dependency">
+                <property name="interface" value="zibo\core\build\handler\FileHandler" />
+                <property name="id" value="default" />
+            </argument>
+        </call>
+        <call method="setFileHandler">
+            <argument name="extension" type="scalar">
+                <property name="value" value="ini" />
+            </argument>
+            <argument name="fileHandler" type="dependency">
+                <property name="interface" value="zibo\core\build\handler\FileHandler" />
+                <property name="id" value="config.ini" />
+            </argument>
+        </call>
+        <call method="setFileHandler">
+            <argument name="extension" type="scalar">
+                <property name="value" value="xml" />
+            </argument>
+            <argument name="fileHandler" type="dependency">
+                <property name="interface" value="zibo\core\build\handler\FileHandler" />
+                <property name="id" value="config.xml" />
+            </argument>
+        </call>
+    </dependency>
+
+    <dependency interface="zibo\core\console\command\Command" class="zibo\core\console\command\BuildCommand" />
+</container>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+    <start>
+        <element name="routes">
+            <zeroOrMore>
+                <ref name="route"/>
+            </zeroOrMore>
+        </element>
+    </start>
+
+    <define name="route">
+        <element name="route">
+            <ref name="attlist.route"/>
+            <zeroOrMore>
+                <ref name="argument"/>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="attlist.route">
+        <group>
+            <attribute name="path"/>
+            <attribute name="controller"/>
+            <optional>
+                <attribute name="action"/>
+            </optional>
+            <optional>
+                <attribute name="id"/>
+            </optional>            
+            <optional>
+                <attribute name="methods"/>
+            </optional>            
+            <optional>
+                <attribute name="dynamic"/>
+            </optional>
+            <optional>
+                <attribute name="locale"/>
+            </optional>            
+            <optional>
+                <attribute name="base"/>
+            </optional>            
+        </group>
+    </define>
+    
+    <define name="argument">
+        <element name="argument">
+            <ref name="attlist.argument"/>
+            <zeroOrMore>
+                <ref name="property"/>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="attlist.argument">
+        <group>
+            <attribute name="name"/>
+            <attribute name="type"/>
+        </group>
+    </define>
+
+    <define name="property">
+        <element name="property">
+            <ref name="attlist.property"/>
+            <empty />
+        </element>
+    </define>
+
+    <define name="attlist.property">
+        <group>
+            <attribute name="name"/>
+            <attribute name="value"/>
+        </group>
+    </define>
+</grammar>

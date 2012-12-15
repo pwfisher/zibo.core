@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>  
+    <dependency class="zibo\library\filesystem\File" id="cache.router">
+        <call method="__construct">
+            <argument name="path" type="parameter">
+                <property name="key" value="system.cache.router" />
+            </argument>
+        </call>
+    </dependency>
+
+    <dependency interface="zibo\core\router\RouteContainerIO" class="zibo\core\router\CachedRouteContainerIO">
+        <call method="__construct">
+            <argument name="io" type="dependency">
+                <property name="interface" value="zibo\core\router\RouteContainerIO" />
+            </argument>
+            <argument name="file" type="dependency">
+                <property name="interface" value="zibo\library\filesystem\File" />
+                <property name="id" value="cache.router" />
+            </argument>
+        </call>
+    </dependency>    
+</container>

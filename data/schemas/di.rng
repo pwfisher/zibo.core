@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+    <start>
+        <element name="container">
+            <zeroOrMore>
+                <ref name="dependency"/>
+            </zeroOrMore>
+        </element>
+    </start>
+
+    <define name="dependency">
+        <element name="dependency">
+            <ref name="attlist.dependency"/>
+            <zeroOrMore>
+                <ref name="call"/>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="attlist.dependency">
+        <choice>
+            <group>
+                <attribute name="interface"/>
+                <attribute name="class"/>
+                <optional>
+                    <attribute name="id" />
+                </optional>
+            </group>
+            <group>
+                <attribute name="class"/>
+                <optional>
+                    <attribute name="id" />
+                </optional>
+            </group>
+            <group>
+                <attribute name="interface"/>
+                <optional>
+                    <attribute name="class"/>
+                </optional>
+                <optional>
+                    <attribute name="id" />
+                </optional>
+                <attribute name="extends" />
+            </group>
+        </choice>    
+    </define>
+
+    <define name="call">
+        <element name="call">
+            <ref name="attlist.call"/>
+            <zeroOrMore>
+                <ref name="argument"/>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="attlist.call">
+        <group>
+            <attribute name="method"/>
+        </group>
+    </define>
+
+    <define name="argument">
+        <element name="argument">
+            <ref name="attlist.argument"/>
+            <zeroOrMore>
+                <ref name="property"/>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="attlist.argument">
+        <group>
+            <attribute name="name"/>
+            <attribute name="type"/>
+        </group>
+    </define>
+
+    <define name="property">
+        <element name="property">
+            <ref name="attlist.property"/>
+            <empty />
+        </element>
+    </define>
+
+    <define name="attlist.property">
+        <group>
+            <attribute name="name"/>
+            <attribute name="value"/>
+        </group>
+    </define>
+</grammar>

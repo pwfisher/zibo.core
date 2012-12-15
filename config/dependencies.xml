@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+    <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\DependencyCacheControl" id="dependencies" />
+    
+    <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\FileSystemCacheControl" id="filesystem" />
+    
+    <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\ParameterCacheControl" id="parameters" />
+    
+    <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\RouteCacheControl" id="routes" />
+
+    <dependency interface="zibo\core\console\input\Input" class="zibo\core\console\input\ConsoleInput" id="command" />
+
+    <dependency interface="zibo\core\console\input\Input" class="zibo\core\console\input\ReadlineInput" id="shell" />
+    
+    <dependency interface="zibo\core\console\output\Output" class="zibo\core\console\output\PhpOutput" />
+    
+    <dependency interface="zibo\core\module\ModuleLoader" class="zibo\core\module\DependencyModuleLoader" id="core" />
+    
+    <dependency class="zibo\library\filesystem\File" id="session">
+        <call method="__construct">
+            <argument name="path" type="parameter">
+                <property name="key" value="system.session.path" />
+            </argument>
+        </call>
+    </dependency>
+    
+    <dependency interface="zibo\library\http\client\Client" class="zibo\library\http\client\CurlClient">
+        <call method="setLog">
+            <argument name="log" type="dependency">
+                <property name="interface" value="zibo\library\log\Log" />
+            </argument>
+        </call>
+    </dependency>
+
+    <dependency interface="zibo\library\http\session\io\SessionIO" class="zibo\library\http\session\io\FileSessionIO" id="file">
+        <call method="__construct">
+            <argument name="path" type="dependency">
+                <property name="interface" value="zibo\library\filesystem\File" />
+                <property name="id" value="session" />
+            </argument>
+            <argument name="timeout" type="parameter">
+                <property name="key" value="system.session.timeout" />
+                <property name="default" value="1800" />
+            </argument>
+        </call>
+    </dependency>
+    
+    <dependency class="zibo\library\http\session\Session" id="core">
+        <call method="__construct">
+            <argument name="io" type="dependency">
+                <property name="interface" value="zibo\library\http\session\io\SessionIO" />
+            </argument>
+        </call>
+    </dependency>
+    
+    <dependency interface="zibo\library\log\listener\LogListener" class="zibo\library\log\listener\FileLogListener" id="file">
+        <call method="__construct">
+            <argument name="fileName" type="parameter">
+                <property name="key" value="log.file" />
+            </argument>
+        </call>
+        <call method="setFileTruncateSize">
+            <argument name="size" type="parameter">
+                <property name="key" value="log.truncate" />
+                <property name="default" value="1024" />
+            </argument>
+        </call>
+        <call method="setLevel">
+            <argument name="level" type="parameter">
+                <property name="key" value="log.level" />
+                <property name="default" value="0" />
+            </argument>
+        </call>
+    </dependency>
+
+    <dependency interface="zibo\library\log\Log" class="zibo\library\log\Log" id="core">
+        <call method="addLogListener">
+            <argument name="listener" type="dependency">
+                <property name="interface" value="zibo\library\log\listener\LogListener" />
+                <property name="id" value="file" />
+            </argument>
+        </call>
+    </dependency>    
+    
+    <dependency interface="zibo\library\mvc\dispatcher\Dispatcher" class="zibo\core\mvc\dispatcher\ZiboDispatcher" id="core">
+        <call method="__construct">
+            <argument name="zibo" type="dependency">
+                <property name="interface" value="zibo\core\Zibo" />
+            </argument>
+        </call>
+    </dependency>
+    
+    <dependency interface="zibo\core\router\RouteContainerIO" class="zibo\core\router\XmlRouteContainerIO" id="core">
+        <call method="__construct">
+            <argument name="environment" type="dependency">
+                <property name="interface" value="zibo\core\environment\Environment" />
+            </argument>
+        </call>
+    </dependency>
+    
+    <dependency class="zibo\library\router\RouteMatcher" />
+    
+    <dependency interface="zibo\library\router\Router" class="zibo\library\router\GenericRouter" id="core">
+        <call method="__construct">
+            <argument name="routeContainer" type="call">
+                <property name="interface" value="zibo\core\router\RouteContainerIO" />
+                <property name="method" value="getRouteContainer" />
+            </argument>
+            <argument name="routeMatcher" type="dependency">
+                <property name="interface" value="zibo\library\router\RouteMatcher" />
+            </argument>
+        </call>
+        <call method="setDefaultAction">
+            <argument name="defaultController" type="parameter">
+                <property name="key" value="system.default.controller" />
+                <property name="default" value="zibo\library\mvc\controller\IndexController" />
+            </argument>
+            <argument name="defaultAction" type="parameter">
+                <property name="key" value="system.default.action" />
+                <property name="default" value="indexAction" />
+            </argument>
+        </call>
+    </dependency>
+</container>
