@@ -2,8 +2,6 @@
 
 namespace zibo\core;
 
-use zibo\library\http\Cookie;
-
 use zibo\core\environment\dependency\argument\CallArgumentParser;
 use zibo\core\environment\dependency\argument\ConfigArgumentParser;
 use zibo\core\environment\dependency\argument\DependencyArgumentParser;
@@ -14,6 +12,7 @@ use zibo\core\mvc\Response;
 
 use zibo\library\dependency\DependencyContainer;
 use zibo\library\dependency\DependencyInjector;
+use zibo\library\http\Cookie;
 use zibo\library\http\Header;
 use zibo\library\http\Request as HttpRequest;
 use zibo\library\log\Log;

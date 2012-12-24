@@ -17,7 +17,7 @@ class DefaultFileHandler implements FileHandler {
      * @return null
      */
     public function handleFile(File $source, File $destination) {
-        $file->copy($destination);
+        $source->copy($destination);
     }
 
 }

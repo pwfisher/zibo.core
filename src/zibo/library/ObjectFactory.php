@@ -13,10 +13,10 @@ use \Exception;
 class ObjectFactory {
 
     /**
-     * Initializes a instance of the provided class
+     * Initializes an instance of the provided class
      * @param string $class Full name of the class
-     * @param string $neededClass Full name of the interface or parent class
-     * @param null|array $arguments The arguments for the constructor
+     * @param string|null $neededClass Full name of the interface or parent class
+     * @param array|null $arguments Named arguments for the constructor
      * @return mixed New instance of the requested class
      * @throws Exception when an invalid argument is provided
      * @throws Exception when the class does not exists
@@ -62,7 +62,7 @@ class ObjectFactory {
     }
 
     /**
-     * Gets the possible arguments for this callback
+     * Gets the possible arguments for the constructor of the provided class
      * @param string $class Full name of the class
      * @return array Array with the name of the argument as key and the type
      * of the argument as value

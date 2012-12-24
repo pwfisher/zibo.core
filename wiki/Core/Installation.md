@@ -35,33 +35,27 @@ Copy the _zibo.core_ directory to your _modules_ directory:
 Copy or link the main _index.php_ file to/in your _public_ directory:
 
     cp modules/zibo.core/src/index.php public
-    
-or
-
-    ln -s modules/zibo.core/src/index.php public
-    
-_Note: when you link the main script, it's automatically updated when you update your core module._
-    
+        
 ### The Console
         
 You can also setup the console by copying or linking it to your installation directory:
 
-    cp modules/zibo.core/src/console.php <installation-directory>
-    
-or 
-    
-    ln -s modules/zibo.core/src/console.php <installation-directory>
+    cp modules/zibo.core/src/console.php application/
     
 ### The Configuration
 
 Create a bootstrap configuration file by copying the default one.
     
-    cp modules/zibo.core/src/config.php config.php
+    cp modules/zibo.core/src/config.php application/bootstrap.config.php
     
 Edit the bootstrap configuration file to match your actual configuration.
 The file is documented and should be self-explainatory.
 
-    nano config.php
+    nano application/config/bootstrap.config.php
+    
+Edit the _console.php_ and the _index.php_ script and adjust the following line:
+
+    const ZIBO_CONFIG = 'bootstrap.config.php';
 
 ### The Webserver
 

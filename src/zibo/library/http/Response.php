@@ -5,60 +5,7 @@ namespace zibo\library\http;
 use \Exception;
 
 /**
- * Represents the response to a request (in mosts cases a HTTP request).
- *
- * Provides an API for dealing with the common parts of a response:
- * <ul>
- *     <li>HTTP status code:
- *          <ul>
- *              <li>{@link setStatusCode() setStatusCode()}</li>
- *              <li>{@link getStatusCode() getStatusCode()}</li>
- *          </ul>
- *     </li>
- *     <li>HTTP headers:
- *          <ul>
- *              <li>{@link addHeader() addHeader()}</li>
- *              <li>{@link setHeader() setHeader()}</li>
- *              <li>{@link hasHeader() hasHeader()}</li>
- *              <li>{@link getHeader() getHeader()}</li>
- *              <li>{@link getHeaders() getHeaders()}</li>
- *              <li>{@link removeHeader() removeHeader()}</li>
- *              <li>{@link getHeaders() getHeaders()}</li>
- *          </ul>
- *     </li>
- *     <li>Cache (HTTP cache expiration and validation):
- *         <ul>
- *         		<li>{@link setIsPublic() setIsPublic()}</li>
- *         		<li>{@link setIsPrivate() setIsPrivate()}</li>
- *              <li>{@link setLastModified() setLastModified()}</li>
- *              <li>{@link getLastModified() getLastModified()}</li>
- *              <li>{@link setETag() setETag()}</li>
- *              <li>{@link getETag() getETag()}</li>
- *              <li>{@link isNotModified() isNotModified()}</li>
- *              <li>{@link setNotModified() setNotModified()}</li>
- *         </ul>
- *     </li>
- *     <li>Redirecting (special purpose methods that use the HTTP status code
- *         and header handling methods under the hood):
- *         <ul>
- *              <li>{@link setRedirect() setRedirect()}</li>
- *              <li>{@link willRedirect() willRedirect()}</li>
- *              <li>{@link clearRedirect() clearRedirect()}</li>
- *         </ul>
- *     </li>
- *     <li>Messages:
- *         <ul>
- *             <li>{@link addMessage() addMessage()}</li>
- *             <li>{@link getMessages() getMessages()}</li>
- *         </ul>
- *     </li>
- *     <li>View (represents the response body):
- *         <ul>
- *             <li>{@link setView() setView()}</li>
- *             <li>{@link getView() getView()}</li>
- *         </ul>
- *     </li>
- * </ul>
+ * Data container for a HTTP response
  */
 class Response {
 

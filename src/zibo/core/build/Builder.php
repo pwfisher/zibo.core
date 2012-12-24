@@ -42,6 +42,8 @@ class Builder {
      * @var array
      */
     private $exclude = array(
+        '.git' => true,
+        '.settings' => true,
         'log' => true,
         'test' => true,
     );
@@ -72,7 +74,7 @@ class Builder {
 
                 $name = $module->getName();
 
-                if ($name == 'test') {
+                if (isset($this->exclude[$name])) {
                     continue;
                 }
 
@@ -96,12 +98,12 @@ class Builder {
         $handlers[self::DEFAULT_HANDLER]->handleDirectory($fileBrowser->getPublicDirectory(), $this->public);
 
         // clear cache
-        $cacheDirectory = new File($this->application, 'data/cache');
+        $cacheDirectory = new File($this->application, Zibo::DIRECTORY_DATA . '/' . Zibo::DIRECTORY_CACHE);
         if ($cacheDirectory->exists()) {
             $cacheDirectory->delete();
         }
 
-        $cacheDirectory = new File($this->public, 'cache');
+        $cacheDirectory = new File($this->public, Zibo::DIRECTORY_CACHE);
         if ($cacheDirectory->exists()) {
             $files = $cacheDirectory->read();
             foreach ($files as $file) {
@@ -109,22 +111,24 @@ class Builder {
             }
         }
 
-        // copy console
-        $consoleFile = new File('../console.php');
-        if ($consoleFile->exists()) {
-            $consoleFile->copy(new File($this->public, $consoleFile));
-        }
-
         // copy htaccess
         $htaccessFile = new File(__DIR__ . '/../../../../.htaccess');
         $htaccessFile->copy(new File($this->public, '.htaccess'));
 
+        // copy console
+        $newConsoleFile = new File($this->application, 'console.php');
+        $consoleFile = new File(__DIR__ . '/../../../console.php');
+        $consoleFile->copy($newConsoleFile);
+
         // copy index
-        $indexFile = new File($fileBrowser->getPublicDirectory(), 'index.php');
-        $indexFile->copy(new File($this->public, 'index.php'));
+        $newIndexFile = new File($this->public, 'index.php');
+        $indexFile = new File(__DIR__ . '/../../../index.php');
+        $indexFile->copy($newIndexFile);
 
         // set Zibo config
+        $newConfigFile = new File($this->application, BootstrapConfig::SCRIPT_CONFIG);
         $configFile = new File(ZIBO_CONFIG);
+
         $config = new BootstrapConfig();
         $config->read($configFile);
         $config->setApplicationDirectory($this->application);
@@ -135,7 +139,13 @@ class Builder {
         $config->setWillCacheDependencies(true);
         $config->setWillCacheFileSystem(false);
         $config->setWillCacheParameters(true);
-        $config->write(new File($destination, $configFile));
+        $config->write($newConfigFile);
+
+        // link the scripts with the config
+        $configPath = $newConfigFile->getAbsolutePath();
+
+        $config->updateScript($newConsoleFile, $configPath);
+        $config->updateScript($newIndexFile, $configPath);
     }
 
     /**
@@ -171,7 +181,5 @@ class Builder {
 
         echo 'Created ' . $this->public . "\n";
     }
-
-
 
 }

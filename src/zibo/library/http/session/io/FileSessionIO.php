@@ -78,10 +78,12 @@ class FileSessionIO implements SessionIO {
 
         if ($file->getModificationTime() < (time() - $this->timeout)) {
             $file->delete();
+
             return array();
         }
 
         $serialized = $file->read();
+
         return unserialize($serialized);
     }
 

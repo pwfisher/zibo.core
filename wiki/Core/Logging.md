@@ -58,7 +58,7 @@ First, create your listener:
         
     }
     
-Then you add it to the core logger using the the dependencies:
+Then you add it to the core logger using the dependencies:
 
     <dependency interface="zibo\library\log\listener\LogListener" class="foo\log\listener\FooLogListener" id="foo" />
 

@@ -4,6 +4,7 @@ namespace zibo\core\console;
 
 use zibo\core\console\command\CacheClearCommand;
 use zibo\core\console\command\DependencySearchCommand;
+use zibo\core\console\command\DeployCommand;
 use zibo\core\console\command\ExitCommand;
 use zibo\core\console\command\HelpCommand;
 use zibo\core\console\command\ParameterGetCommand;
@@ -165,6 +166,7 @@ class Console {
         $this->interpreter = new CommandInterpreter($zibo);
         $this->interpreter->registerCommand(new CacheClearCommand());
         $this->interpreter->registerCommand(new DependencySearchCommand());
+        $this->interpreter->registerCommand(new DeployCommand());
         $this->interpreter->registerCommand(new ExitCommand());
         $this->interpreter->registerCommand(new HelpCommand($this->interpreter));
         $this->interpreter->registerCommand(new ParameterGetCommand());

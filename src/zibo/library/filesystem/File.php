@@ -109,6 +109,15 @@ class File {
     }
 
     /**
+     * Creates a temporary file
+     * @param string $name Prefix for the name
+     * @return zibo\library\filesystem\File
+     */
+    public static function getTemporaryFile($name = 'temp') {
+        return new File(tempnam(sys_get_temp_dir(), $name));
+    }
+
+    /**
      * Get the name of the file
      *
      * If you provide a path like /var/www/yoursite, the name will be yoursite

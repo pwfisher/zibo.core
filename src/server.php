@@ -1,19 +1,19 @@
 <?php
 
 /**
- * Main script for a Zibo web application server
+ * Main script for a Zibo web application server (experimental)
  */
 
 /**
  * Path to the Zibo bootstrap configuration file
  * @var string
  */
-const ZIBO_CONFIG = 'config.php';
+const ZIBO_CONFIG = 'bootstrap.config.php';
 
 try {
     if (!file_exists(ZIBO_CONFIG)) {
         $path = realpath(dirname(ZIBO_CONFIG));
-        throw new Exception('No configuration file exists, please copy zibo.core/src/config.php to ' . $path . '.');
+        throw new Exception('No configuration file exists, please copy zibo.core/src/bootstrap.config.php to ' . $path . '.');
     }
     include_once ZIBO_CONFIG;
 

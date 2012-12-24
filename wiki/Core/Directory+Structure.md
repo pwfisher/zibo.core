@@ -31,7 +31,7 @@ See the Deployment page for more information.
 The directory structure for modules and the application directory looks like the following if applicable:
 
 * __config__  
-configuration files
+configuration resources
 * __data__  
 data resources needed by the implementation
 * __l10n__  
@@ -39,11 +39,13 @@ translations
 * __log__  
 log files (only in application)
 * __public__  
-files hosted directly by the webserver
+resources hosted directly by the webserver
 * __src__  
 sources of the implementation; the PHP files
 * __test__  
 a nested module directory structure
+* __vendor__  
+external vendor libraries
 * __view__  
 templates of the views
 * __web__  

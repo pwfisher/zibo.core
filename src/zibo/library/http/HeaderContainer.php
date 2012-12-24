@@ -149,6 +149,7 @@ class HeaderContainer implements Iterator, Countable {
      */
     public function hasHeader($name) {
         $name = Header::parseName($name);
+
         return isset($this->headers[$name]);
     }
 

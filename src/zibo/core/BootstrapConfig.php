@@ -4,6 +4,8 @@ namespace zibo\core;
 
 use zibo\library\filesystem\File;
 
+use \Exception;
+
 /**
  * Read and write the Zibo bootstrap configuration
  */
@@ -14,6 +16,12 @@ class BootstrapConfig {
      * @var string
      */
     const DEFAULT_ENVIRONMENT = 'dev';
+
+    /**
+     * Name of the bootstrap config script
+     * @var string
+     */
+    const SCRIPT_CONFIG = 'bootstrap.config.php';
 
     /**
      * Path of the zibo.core module
@@ -184,7 +192,7 @@ class BootstrapConfig {
      */
     public function setEnvironment($environment) {
         if (!is_string($environment) || $environment == '') {
-            throw new BuildException('Provided environment is empty or invalid');
+            throw new Exception('Provided environment is empty or invalid');
         }
 
         $this->environment = $environment;
@@ -351,6 +359,43 @@ class BootstrapConfig {
         $parent->create();
 
         $file->write($output);
+    }
+
+    /**
+     * Updates the ZIBO_CONFIG constant in the provided script with the path of
+     * the provided config as value
+     * @param zibo\library\filesystem\File $script Script to modify
+     * @param string $path Path to the config file
+     * @return null
+     * @throws Exception when the ZIBO_CONFIG constant could not be found
+     */
+    public function updateScript(File $script, $path) {
+        if ($script->isDirectory()) {
+            throw new Exception('Could not update the provided script: ' . $script . ' is a directory');
+        }
+
+        $contents = $script->read();
+        $newContents = '';
+        $found = false;
+
+        $lines = explode("\n", $contents);
+        foreach ($lines as $line) {
+            if (strpos($line, 'const ZIBO_CONFIG') !== 0) {
+                $newContents .= $line . "\n";
+
+                continue;
+            }
+
+            $newContents .= "const ZIBO_CONFIG = '" . $path . "';\n";
+
+            $found = true;
+        }
+
+        if (!$found) {
+            throw new Exception('Could not update the provided script: ' . $script . ' does not contain "const ZIBO_CONFIG".');
+        }
+
+        $script->write($newContents);
     }
 
 }
