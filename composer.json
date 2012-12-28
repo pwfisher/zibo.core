@@ -9,6 +9,9 @@
             "email": "joris@statik.be",
         }
     ],
+    "require": {
+        "zibo/composer.installer": "*"
+    },
     suggest": {
         "zibo/app": "A module to create a ready to use application framework out of Zibo."
     }
