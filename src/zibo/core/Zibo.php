@@ -32,7 +32,7 @@ class Zibo {
      * The version of Zibo
      * @var string
      */
-    const VERSION = '0.11.0';
+    const VERSION = '0.12.0';
 
     /**
      * Full class name of the default controller
@@ -147,30 +147,6 @@ class Zibo {
      * @var string
      */
     const EVENT_POST_RESPONSE = 'core.response.post';
-
-    /**
-     * Class name of the dispatcher interface
-     * @var string
-     */
-    const INTERFACE_DISPATCHER = 'zibo\\library\\mvc\\dispatcher\\Dispatcher';
-
-    /**
-     * Class name of the file browser interface
-     * @var string
-     */
-    const INTERFACE_FILE_BROWSER = 'zibo\\core\\environment\\filebrowser\\FileBrowser';
-
-    /**
-     * Class name of the module loader interface
-     * @var string
-     */
-    const INTERFACE_MODULE_LOADER = 'zibo\\core\\module\\ModuleLoader';
-
-    /**
-     * Class name of the router interface
-     * @var string
-     */
-    const INTERFACE_ROUTER = 'zibo\\library\\router\\Router';
 
     /**
      * The source name of the log messages
@@ -427,7 +403,7 @@ class Zibo {
         $this->dependencyInjector->setInstance($this);
         $this->dependencyInjector->setInstance($this->environment);
         $this->dependencyInjector->setInstance($this->environment->getConfig());
-        $this->dependencyInjector->setInstance($this->environment->getFileBrowser(), self::INTERFACE_FILE_BROWSER);
+        $this->dependencyInjector->setInstance($this->environment->getFileBrowser(), 'zibo\\core\\environment\\filebrowser\\FileBrowser');
     }
 
     /**
@@ -435,10 +411,6 @@ class Zibo {
      * @return zibo\library\dependency\DependencyInjector
      */
     public function getDependencyInjector() {
-        if ($this->dependencyInjector === null) {
-            $this->setDependencyInjector();
-        }
-
         return $this->dependencyInjector;
     }
 
@@ -530,7 +502,7 @@ class Zibo {
     public function bootModules() {
         $this->state = self::STATE_BOOT;
 
-        $moduleLoader = $this->getDependency(self::INTERFACE_MODULE_LOADER);
+        $moduleLoader = $this->getDependency('zibo\\core\\module\\ModuleLoader');
 
         $modules = $moduleLoader->loadModules($this);
         foreach ($modules as $module) {
@@ -584,7 +556,7 @@ class Zibo {
      */
     public function getRouter() {
         if (!$this->router) {
-            $this->router = $this->getDependency(self::INTERFACE_ROUTER);
+            $this->router = $this->getDependency('zibo\\library\\router\\Router');
         }
 
         return $this->router;
@@ -624,7 +596,7 @@ class Zibo {
      */
     public function getDispatcher() {
         if (!$this->dispatcher) {
-            $this->dispatcher = $this->getDependency(self::INTERFACE_DISPATCHER);
+            $this->dispatcher = $this->getDependency('zibo\\library\\mvc\\dispatcher\\Dispatcher');
         }
 
         return $this->dispatcher;
