@@ -12,7 +12,7 @@
     "require": {
         "zibo/composer.installer": "*"
     },
-    suggest": {
+    "suggest": {
         "zibo/app": "A module to create a ready to use application framework out of Zibo."
     }
 }
