@@ -1,0 +1,15 @@
+{
+    "name": "zibo/core",
+    "description": "A object oriented PHP web application framework.",
+    "version": "0.12.0",
+    "type": "zibo-module",
+    "authors": [
+        {
+            "name": "Joris Vandeweerd",
+            "email": "joris@statik.be",
+        }
+    ],
+    suggest": {
+        "zibo/app": "A module to create a ready to use application framework out of Zibo."
+    }
+}
