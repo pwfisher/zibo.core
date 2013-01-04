@@ -42,6 +42,14 @@ class Log {
     }
 
     /**
+     * Gets the request id
+     * @return string
+     */
+    public function getRequestId() {
+        return $this->requestId;
+    }
+
+    /**
      * Adds a listener
      * @param zibo\library\log\listener\LogListener $listener
      * @return null
