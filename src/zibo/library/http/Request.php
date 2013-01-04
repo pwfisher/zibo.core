@@ -173,7 +173,6 @@ class Request {
         );
     }
 
-
     /**
      * Gets a string representation of this request
      * @return string

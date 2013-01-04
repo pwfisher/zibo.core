@@ -136,6 +136,28 @@ class Response {
     }
 
     /**
+     * Gets a string representation of this response
+     * @return string
+     */
+    public function __toString() {
+        $request = $this->statusCode . "\r\n";
+
+        foreach ($this->headers as $header) {
+            $request .= (string) $header . "\r\n";
+        }
+
+        foreach ($this->cookies as $cookie) {
+            $request .= Header::HEADER_SET_COOKIE . ': ' . $cookie . "\r\n";
+        }
+
+        if ($this->body) {
+            $request .= "\r\n" . $this->body . "\r\n";
+        }
+
+        return $request;
+    }
+
+    /**
      * Sets the HTTP status code. At Wikipedia you can find a
      * {@link http://en.wikipedia.org/wiki/List_of_HTTP_status_codes list of HTTP status codes}.
      * @param integer $code The HTTP status code
