@@ -140,7 +140,7 @@ You can also provide your arguments to the route:
 
     $url = $this->getUrl('person.detail', array('id' => 5));
     
-See the [routing page](/wiki/page/Core/Routing) for more information.
+See the [Routing](/manual/page/Core/Routing) page for more information.
 
 ### Set A Download View
 

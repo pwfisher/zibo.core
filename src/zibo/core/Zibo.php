@@ -71,6 +71,12 @@ class Zibo {
     const DIRECTORY_L10N = 'l10n';
 
     /**
+     * Name of the manual directory
+     * @var string
+     */
+    const DIRECTORY_MANUAL = 'manual';
+
+    /**
      * Name of the public directory
      * @var string
      */

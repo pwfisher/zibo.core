@@ -43,12 +43,12 @@ Assume the following _deploy.ini_ with the definition for the _staging_ profile:
     path.public = /path/to/public
     ; ssh.key = /path/to/ssh_key
 
-The _deploy_ command will use these arguments to create a [Deployer](/api/class/zibo/core/build/Deployer) instance.
+The _deploy_ command will use these arguments to create a [zibo\core\build\Deployer](/api/class/zibo/core/build/Deployer) instance.
 All other parameters which are set for your profile will be set as custom parameters to that Deployer instance.
 
 ### Events
 
-Use the events of [Deployer](/api/class/zibo/core/build/Deployer) to hook extra logic into your deployment.
+Use the events of [zibo\core\build\Deployer](/api/class/zibo/core/build/Deployer) to hook extra logic into your deployment.
 
 The following events are triggered:
 

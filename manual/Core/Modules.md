@@ -3,7 +3,7 @@ Modules are a great way to keep your code structured and flexible.
 
 ## Create Your Own Module
 
-A module is a directory containing the defined [directory structure](/wiki/page/Core/Directory+Structure).
+A module is a directory containing the defined [directory structure](/manual/page/Core/Directory+Structure).
 To use a module in your installation, simply place it in a modules directory as defined in your bootstrap configuration.
 The module is now used by Zibo.
 Depending on your enabled caches, you might have to clear your cache first before it's fully active.
@@ -34,7 +34,7 @@ An example of a module:
     
     }
 
-Zibo will not look for your _Module_ implementation, you have to define it through the dependencies.
+Zibo will not look for your [zibo\core\module\Module](/api/class/zibo/core/module/Module) implementation, you have to define it through the dependencies.
 It's good practice to use the full module name as id of your dependency.
 
     <dependencies>

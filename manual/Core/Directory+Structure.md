@@ -38,6 +38,8 @@ data resources needed by the implementation
 translations
 * __log__  
 log files (only in application)
+* __manual__  
+sources of the manual documentation pages
 * __public__  
 resources hosted directly by the webserver
 * __src__  
@@ -50,5 +52,3 @@ external vendor libraries
 templates of the views
 * __web__  
 resources open to the world but hosted by Zibo
-* __wiki__  
-sources of the wiki documentation pages
