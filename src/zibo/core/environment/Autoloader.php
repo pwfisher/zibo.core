@@ -78,6 +78,12 @@ class Autoloader {
         if (!spl_autoload_register(array($this, 'autoload'), false, $prepend)) {
             throw new ZiboException('Could not register this autoloader');
         }
+
+        // check for a composer autoloader
+        $file = new File($this->fileBrowser->getApplicationDirectory(), Zibo::DIRECTORY_VENDOR . '/autoload.php');
+        if ($file->exists()) {
+            include_once($file->getPath());
+        }
     }
 
     /**

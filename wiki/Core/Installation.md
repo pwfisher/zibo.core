@@ -7,7 +7,34 @@ Your modules of Zibo are placed in this directory
 * __application__  
 The files specific to your application come in this directory
 
-## Installation On Linux
+## With Composer
+
+You can use [Composer](http://getcomposer.org) for a automatic installation. 
+ 
+After installing Composer, create a _composer.json_ file in your installation directory with the following contents:
+
+    {
+        "minimum-stability": "dev",
+        "config": {
+            "bin-dir": "application",
+            "vendor-dir": "application/vendor"
+        },    
+        "require": {
+            "zibo/core": "*",
+        },
+        "repositories": [
+            {
+                "type": "composer",
+                "url": "http://www.zibo.be"
+            }
+        ]
+    }
+
+Now you can simply run: 
+
+    composer install
+
+## Manual Installation
 
 ### Preparation
 
@@ -30,15 +57,15 @@ Create the directories for _public_, _modules_ and _application_:
     
 Copy the _zibo.core_ directory to your _modules_ directory:
 
-    cp -r <extract-directory>/zibo.core modules
+    cp -r <zibo.core directory> modules
    
-Copy or link the main _index.php_ file to/in your _public_ directory:
+Copy the main _index.php_ file to/in your _public_ directory:
 
     cp modules/zibo.core/src/index.php public
         
 ### The Console
         
-You can also setup the console by copying or linking it to your installation directory:
+You can setup the console by copying it to your application directory:
 
     cp modules/zibo.core/src/console.php application/
     
@@ -51,11 +78,13 @@ Create a bootstrap configuration file by copying the default one.
 Edit the bootstrap configuration file to match your actual configuration.
 The file is documented and should be self-explainatory.
 
-    nano application/config/bootstrap.config.php
+    nano application/bootstrap.config.php
     
 Edit the _console.php_ and the _index.php_ script and adjust the following line:
 
     const ZIBO_CONFIG = 'bootstrap.config.php';
+    
+_Note: it's best to use absolute paths, you can then access the console.php from anywhere._
 
 ### The Webserver
 
