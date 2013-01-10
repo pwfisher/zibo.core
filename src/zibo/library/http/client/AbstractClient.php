@@ -2,6 +2,8 @@
 
 namespace zibo\library\http\client;
 
+use zibo\core\Zibo;
+
 use zibo\library\http\exception\HttpException;
 use zibo\library\http\Header;
 use zibo\library\http\HeaderContainer;
@@ -128,7 +130,16 @@ abstract class AbstractClient implements Client {
         }
 
         foreach ($headers as $header => $value) {
-            $container->addHeader($header, $value);
+            $prepend = false;
+            if (ucfirst(strtolower($header)) == Header::HEADER_HOST) {
+                $prepend = true;
+            }
+
+            $container->addHeader($header, $value, $prepend);
+        }
+
+        if (!$container->hasHeader(Header::HEADER_USER_AGENT)) {
+            $container->addHeader(Header::HEADER_USER_AGENT, 'Zibo ' . Zibo::VERSION);
         }
 
         return $container;

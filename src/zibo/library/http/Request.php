@@ -184,8 +184,8 @@ class Request {
             $request .= (string) $header . "\r\n";
         }
 
-        if ($this->body) {
-            $request .= "\r\n" . $this->body . "\r\n";
+        if ($this->getBody()) {
+            $request .= "\r\n" . $this->getBody() . "\r\n";
         }
 
         return $request;
@@ -346,6 +346,10 @@ class Request {
             $host = 'localhost';
         }
 
+        if ($this->isSecure) {
+            return 'https://' . $host;
+        }
+
         return 'http://' . $host;
     }
 
@@ -407,6 +411,7 @@ class Request {
     public function setBody($body) {
         if (is_array($body)) {
             $this->bodyParameters = $body;
+
             return;
         }
 
@@ -451,6 +456,10 @@ class Request {
      * @return array
      */
     public function getBodyParameters() {
+        if (!$this->bodyParameters && $this->body) {
+            return self::parseQueryString($this->body);
+        }
+
         return $this->bodyParameters;
     }
 

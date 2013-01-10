@@ -6,6 +6,8 @@ use zibo\library\http\exception\HttpException;
 use zibo\library\http\Request;
 use zibo\library\http\Response;
 
+use \Exception;
+
 /**
  * cURL implementation of the HTTP client
  */
@@ -32,9 +34,13 @@ class CurlClient extends AbstractClient {
     public function sendRequest(Request $request) {
         $options = array(
             CURLOPT_CUSTOMREQUEST => $request->getMethod(),
-            CURLOPT_HEADER => true,
-            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => $request->getUrl(),
+            CURLOPT_FOLLOWLOCATION => 0,
+            CURLOPT_HEADER => true,
+            CURLOPT_FAILONERROR => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_VERBOSE => false,
         );
 
         $headers = (string) $request->getHeaders();
@@ -51,10 +57,15 @@ class CurlClient extends AbstractClient {
         curl_setopt_array($curl, $options);
 
         if ($this->log) {
-            $this->log->logDebug('Sending request', $request, self::LOG_SOURCE);
+            $this->log->logDebug('Sending ' . ($request->isSecure() ? 'secure ' : '') . 'request', $request, self::LOG_SOURCE);
         }
 
         $responseString = curl_exec($curl);
+
+        $error = curl_error($curl);
+        if ($error) {
+            throw new Exception('cURL returned error: ' . $error);
+        }
 
         if ($this->log) {
             $this->log->logDebug('Received response', $responseString, self::LOG_SOURCE);

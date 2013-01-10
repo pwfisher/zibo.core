@@ -82,9 +82,9 @@ class HeaderContainer implements Iterator, Countable {
      * Adds a header to this container
      * @param string|Header $header Name of the header or a Header instance
      * @param string|null $value The value of the header or null if a Header
+     * instance is provided
      * @param boolean $prepend Set to true to add the header at the beginning,
      * only for new headers
-     * instance is provided
      * @return null
      * @see setHeader
      */
@@ -127,10 +127,12 @@ class HeaderContainer implements Iterator, Countable {
      * @param string|Header $header Name of the header or a Header instance
      * @param string|null $value The value of the header or null if a Header
      * instance is provided
+     * @param boolean $prepend Set to true to add the header at the beginning,
+     * only for new headers
      * @return null
      * @see addHeader
      */
-    public function setHeader($header, $value = null) {
+    public function setHeader($header, $value = null, $prepend = false) {
         if (!$header instanceof Header) {
             $header = new Header($header, $value);
         }
@@ -139,7 +141,7 @@ class HeaderContainer implements Iterator, Countable {
             unset($this->headers[$header->getName()]);
         }
 
-        $this->addHeader($header);
+        $this->addHeader($header, null, $prepend);
     }
 
     /**
