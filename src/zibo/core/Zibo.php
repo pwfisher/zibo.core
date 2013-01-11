@@ -627,13 +627,14 @@ class Zibo {
             $method = $httpRequest->getMethod();
 
             $this->log->logDebug('Receiving request', $method . ' ' . $httpRequest->getPath(), self::LOG_SOURCE);
-            if ($method == Request::METHOD_POST) {
-                $this->log->logDebug('POST body parameters', $httpRequest->getBodyParametersAsString(), self::LOG_SOURCE);
-            }
 
             $headers = $httpRequest->getHeaders();
             foreach ($headers as $header) {
                 $this->log->logDebug('Receiving header', $header, self::LOG_SOURCE);
+            }
+
+            if ($httpRequest->getBody()) {
+                $this->log->logDebug('Request body', $httpRequest->getBody(), self::LOG_SOURCE);
             }
         }
 
@@ -827,6 +828,7 @@ class Zibo {
                 $this->log->logDebug('Current session:', $session->getId(), self::LOG_SOURCE);
 
                 $variables = $session->getAll();
+                ksort($variables);
                 foreach ($variables as $name => $value) {
                     $this->log->logDebug('- ' . $name, var_export($value, true), self::LOG_SOURCE);
                 }

@@ -130,12 +130,7 @@ abstract class AbstractClient implements Client {
         }
 
         foreach ($headers as $header => $value) {
-            $prepend = false;
-            if (ucfirst(strtolower($header)) == Header::HEADER_HOST) {
-                $prepend = true;
-            }
-
-            $container->addHeader($header, $value, $prepend);
+            $container->addHeader($header, $value);
         }
 
         if (!$container->hasHeader(Header::HEADER_USER_AGENT)) {
@@ -173,7 +168,7 @@ abstract class AbstractClient implements Client {
         }
 
         if (isset($vars['host'])) {
-            $headers->addHeader(Header::HEADER_HOST, $vars['host']);
+            $headers->setHeader(Header::HEADER_HOST, $vars['host'], true);
         }
 
         if (isset($vars['query'])) {

@@ -456,10 +456,6 @@ class Request {
      * @return array
      */
     public function getBodyParameters() {
-        if (!$this->bodyParameters && $this->body) {
-            return self::parseQueryString($this->body);
-        }
-
         return $this->bodyParameters;
     }
 
