@@ -23,6 +23,12 @@ use zibo\library\Value;
 class ZiboDispatcher extends GenericDispatcher {
 
     /**
+     * Separator between controller class name and the dependency id
+     * @var string
+     */
+    const SEPARATOR_CONTROLLER_DEPENDENCY = '#';
+
+    /**
      * The instance of Zibo
      * @var zibo\core\Zibo
      */
@@ -35,6 +41,27 @@ class ZiboDispatcher extends GenericDispatcher {
      */
     public function __construct(Zibo $zibo) {
         $this->zibo = $zibo;
+    }
+
+    /**
+     * Gets the controller of a request.
+     * @param zibo\library\router\Route $route
+     * @return zibo\library\mvc\controller\Controller
+     * @throws Exception when the controller could not be created
+     */
+    protected function getController(Route $route, &$controller, &$action) {
+        list($controller, $method) = $route->getCallback();
+
+        $positionColon = strpos($controller, self::SEPARATOR_CONTROLLER_DEPENDENCY);
+        if ($positionColon !== false) {
+            list($interface, $id) = explode(self::SEPARATOR_CONTROLLER_DEPENDENCY, $controller);
+
+            $controller = $this->zibo->getDependency($interface, $id);
+
+            $route->setCallback(array($controller, $method));
+        }
+
+        parent::getController($route, $controller, $action);
     }
 
     /**

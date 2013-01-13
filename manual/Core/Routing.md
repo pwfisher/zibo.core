@@ -50,7 +50,7 @@ The same request with a POST method will be translated into _BlogController->add
 
 A dynamic route can be used to match everything relative to the defined path.
 
-    <route path="/web" controller="zibo\core\mvc\controller\WebController" dynamic="true" />
+    <route path="/web" controller="zibo\core\mvc\controller\WebController" dynamic="true" id="web" />
     
 When the path _/web/directory/file_ is requested, it will be translated into _WebController->indexAction('directory', 'file')_.
     
@@ -75,6 +75,16 @@ This route will go to the Todo page of the wiki.
 
 Predefined arguments are defined the same way as an argument for a dependency call.
 See the dependencies page for a more detailed explaination.
+
+### Route With A Dependency Controller
+
+You can use a controller from your dependencies by adding the dependency id of your controller after a _#_.
+
+    <route path="/web" controller="zibo\core\mvc\controller\WebController#vendor" dynamic="true" id="web" />
+
+Now, you only have to define a dependency for your controller interface with the id _vendor_. 
+Check the [Dependencies](/manual/page/Core/Dependencies) page for more information about defining dependencies.
+
 
 ## Obtain A URL
 

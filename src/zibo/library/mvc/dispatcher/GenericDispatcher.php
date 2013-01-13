@@ -56,7 +56,7 @@ class GenericDispatcher implements Dispatcher {
      * @throws Exception when the controller could not be created
      */
     protected function getController(Route $route, &$controller, &$action) {
-        $callback = $route->getCallback();
+        $callback = new Callback($route->getCallback());
 
         $controller = $callback->getClass();
         if (!$controller) {

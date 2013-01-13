@@ -3,7 +3,6 @@
 namespace zibo\library\router;
 
 use zibo\library\router\exception\RouterException;
-use zibo\library\Callback;
 
 /**
  * Data container for the definition of a controller action
@@ -30,7 +29,7 @@ class Route {
 
     /**
      * The callback for this route
-     * @var zibo\library\Callback
+     * @var string|array
      */
     private $callback;
 
@@ -67,8 +66,7 @@ class Route {
     /**
      * Constructs a new route
      * @param string $path URL path to the controller
-     * @param string|array|zibo\library\Callback $callback A callback to the
-     * action of this route
+     * @param string|array $callback Callback to the action of this route
      * @param string $id The id of this route
      * @param string|array|null $allowedMethods The allowed methods for this
      * route
@@ -91,7 +89,13 @@ class Route {
      * @return string
      */
     public function __toString() {
-        $string = $this->path . ' ' . $this->callback;
+        $string = $this->path . ' ';
+
+        if (is_array($this->callback) && count($this->callback) == 2 && isset($this->callback[0])) {
+            $string .= $this->callback[0] . '->' . $this->callback[1];
+        } else {
+            $string .= $this->callback;
+        }
 
         if ($this->arguments) {
             $string .= '(' . implode(', ', $this->arguments) . ')';
@@ -207,18 +211,16 @@ class Route {
 
     /**
      * Sets the callback of this route
-     * @param string $callback string|array|zibo\library\Callback A callback
-     * to the action of this route
+     * @param string $callback string|array Callback to the action of the route
      * @return null
-     * @throws zibo\ZiboException when the provided callback is invalid
      */
     public function setCallback($callback) {
-        $this->callback = new Callback($callback);
+        $this->callback = $callback;
     }
 
     /**
      * Gets the callback for this route
-     * @return zibo\library\Callback
+     * @return string|array
      */
     public function getCallback() {
         return $this->callback;
@@ -227,7 +229,7 @@ class Route {
     /**
      * Sets the id of this route
      * @param string $id The id of this route
-     * @throws RouterException
+     * @throws zibo\library\router\exception\RouterException
      */
     public function setId($id = null) {
         if ($id !== null && (!is_string($id) || $id == '')) {
@@ -249,7 +251,7 @@ class Route {
      * Sets the allowed methods for this route
      * @param null|string|array $allowedMethods The allowed methods of this route
      * @return null
-     * @throws RouterException
+     * @throws zibo\library\router\exception\RouterException
      */
     public function setAllowedMethods($allowedMethods = null) {
         if ($allowedMethods === null) {
