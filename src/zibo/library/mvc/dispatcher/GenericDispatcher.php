@@ -52,7 +52,10 @@ class GenericDispatcher implements Dispatcher {
     /**
      * Gets the controller of a request.
      * @param zibo\library\router\Route $route
-     * @return zibo\library\mvc\controller\Controller
+     * @param zibo\library\mvc\controller\Controller $controller Result for the
+     * controller of the action
+     * @param string $action Result for the name of the method
+     * @return null
      * @throws Exception when the controller could not be created
      */
     protected function getController(Route $route, &$controller, &$action) {

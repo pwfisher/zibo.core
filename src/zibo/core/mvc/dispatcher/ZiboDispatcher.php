@@ -46,11 +46,23 @@ class ZiboDispatcher extends GenericDispatcher {
     /**
      * Gets the controller of a request.
      * @param zibo\library\router\Route $route
-     * @return zibo\library\mvc\controller\Controller
+     * @param zibo\library\mvc\controller\Controller $controller Result for the
+     * controller of the action
+     * @param string $action Result for the name of the method
+     * @return null
      * @throws Exception when the controller could not be created
      */
     protected function getController(Route $route, &$controller, &$action) {
-        list($controller, $method) = $route->getCallback();
+        $callback = $route->getCallback();
+
+        if (!is_array($callback)) {
+            return parent::getController($route, $controller, $action);
+        }
+
+        list($controller, $action) = $callback;
+        if (!is_string($controller)) {
+            return parent::getController($route, $controller, $action);
+        }
 
         $positionColon = strpos($controller, self::SEPARATOR_CONTROLLER_DEPENDENCY);
         if ($positionColon !== false) {
@@ -58,7 +70,7 @@ class ZiboDispatcher extends GenericDispatcher {
 
             $controller = $this->zibo->getDependency($interface, $id);
 
-            $route->setCallback(array($controller, $method));
+            $route->setCallback(array($controller, $action));
         }
 
         parent::getController($route, $controller, $action);
