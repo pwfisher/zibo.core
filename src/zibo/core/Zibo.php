@@ -398,14 +398,13 @@ class Zibo {
         $configArgumentParser = new ConfigArgumentParser($config);
         $dependencyArgumentParser = new DependencyArgumentParser($config);
 
-        $this->dependencyInjector = new DependencyInjector();
+        $container = $this->environment->getDependencyContainer();
+
+        $this->dependencyInjector = new DependencyInjector($container);
         $this->dependencyInjector->setArgumentParser(DependencyInjector::TYPE_CALL, $callArgumentParser);
         $this->dependencyInjector->setArgumentParser(DependencyInjector::TYPE_DEPENDENCY, $dependencyArgumentParser);
         $this->dependencyInjector->setArgumentParser('parameter', $configArgumentParser);
 
-        $container = $this->environment->getDependencyContainer();
-
-        $this->dependencyInjector->setContainer($container);
         $this->dependencyInjector->setInstance($this);
         $this->dependencyInjector->setInstance($this->environment);
         $this->dependencyInjector->setInstance($this->environment->getConfig());

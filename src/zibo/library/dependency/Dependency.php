@@ -34,6 +34,12 @@ class Dependency {
     protected $calls;
 
     /**
+     * Interfaces to implement
+     * @var array
+     */
+    protected $interfaces;
+
+    /**
      * Constructs a new dependency
      * @param string $className A full class name
      * @return null
@@ -41,7 +47,10 @@ class Dependency {
     public function __construct($className, $id = null) {
         $this->setClassName($className);
         $this->setId($id);
-        $this->clearCalls();
+
+        $this->constructorArguments = null;
+        $this->calls = null;
+        $this->interfaces = array();
     }
 
     /**
@@ -102,12 +111,14 @@ class Dependency {
     public function addCall(DependencyCall $call) {
         if ($call->getMethodName() == '__construct') {
             $this->constructorArguments = $call->getArguments();
+
             return;
         }
 
         $id = $call->getId();
         if (!$id) {
             $id = 'c' . count($this->calls);
+
             $call->setId($id);
         }
 
@@ -130,6 +141,45 @@ class Dependency {
     public function clearCalls() {
         $this->constructorArguments = null;
         $this->calls = null;
+    }
+
+    /**
+     * Adds an interface which this dependency implements
+     * @param string $interface Class name of the interface
+     * @return null
+     */
+    public function addInterface($interface) {
+        $this->interfaces[$interface] = true;
+    }
+
+    /**
+     * Removes an interface
+     * @param string $interface Class name of the interface
+     * @return null
+     */
+    public function removeInterface($interface) {
+        if (isset($this->interfaces[$interface])) {
+            unset($this->interfaces[$interface]);
+        }
+    }
+
+    /**
+     * Sets the interfaces of this dependency
+     * @param array $interfaces Array with the class name of the interface as
+     * key and true as value
+     * @return null
+     */
+    public function setInterfaces(array $interfaces) {
+        $this->interfaces = $interfaces;
+    }
+
+    /**
+     * Gets the interfaces of this dependency
+     * @return array Array with the classname of the interface as key and true
+     * as value
+     */
+    public function getInterfaces() {
+        return $this->interfaces;
     }
 
 }

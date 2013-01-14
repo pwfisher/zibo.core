@@ -167,12 +167,12 @@ class ZiboXmlDependencyIO implements DependencyIO {
                 $id = null;
             }
 
-            if (!$interface) {
-                $interface = $className;
-            }
-
             $extends = $dependencyElement->getAttribute(self::ATTRIBUTE_EXTENDS);
             if ($extends) {
+                if (!$interface) {
+                    $interface = $className;
+                }
+
                 $dependencies = $container->getDependencies($interface);
                 if (isset($dependencies[$extends])) {
                     $dependency = clone $dependencies[$extends];
@@ -181,27 +181,27 @@ class ZiboXmlDependencyIO implements DependencyIO {
                         $dependency->setClassName($className);
                     }
                 } else {
-//                     print_r($dependencies);
                     throw new DependencyException('No dependency set to extend interface ' . $interface . ' with id ' . $extends);
                 }
             } else {
                 $dependency = new Dependency($className, $id);
             }
 
-            $this->readCalls($dependency, $dependencyElement);
+            $this->readCalls($dependencyElement, $dependency);
+            $this->readInterfaces($dependencyElement, $dependency, $interface, $className);
 
-            $container->addDependency($interface, $dependency);
+            $container->addDependency($dependency);
         }
     }
 
     /**
      * Reads the calls from the provided dependency element and adds them to
      * the dependency instance
-     * @param zibo\core\dependency\Dependency $dependency
      * @param DOMElement $dependencyElement
+     * @param zibo\core\dependency\Dependency $dependency
      * @return null
      */
-    private function readCalls(Dependency $dependency, DOMElement $dependencyElement) {
+    private function readCalls(DOMElement $dependencyElement, Dependency $dependency) {
         $calls = array();
 
         $callElements = $dependencyElement->getElementsByTagName(self::TAG_CALL);
@@ -229,6 +229,36 @@ class ZiboXmlDependencyIO implements DependencyIO {
 
             $dependency->addCall($call);
         }
+    }
+
+    /**
+     * Reads the interfaces from the provided dependency element and adds them
+     * to the dependency instance
+     * @param DOMElement $dependencyElement
+     * @param zibo\core\dependency\Dependency $dependency
+     * @param string $interface Class name of the interface
+     * @param string $className Class name of the instance
+     * @return null
+     */
+    private function readInterfaces(DOMElement $dependencyElement, Dependency $dependency, $interface, $className) {
+        $interfaces = array();
+
+        $interfaceElements = $dependencyElement->getElementsByTagName(self::ATTRIBUTE_INTERFACE);
+        foreach ($interfaceElements as $interfaceElement) {
+            $interfaceName = $interfaceElement->getAttribute(self::ATTRIBUTE_NAME);
+
+            $interfaces[$interfaceName] = true;
+        }
+
+        if ($interface) {
+            $interfaces[$interface] = true;
+        }
+
+        if (!$interfaces) {
+            $interfaces[$className] = true;
+        }
+
+        $dependency->setInterfaces($interfaces);
     }
 
 }

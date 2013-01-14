@@ -57,38 +57,54 @@ class DependencyInjector {
      * Instance of the object factory
      * @var zibo\library\ObjectFactory
      */
-    protected static $objectFactory;
+    protected $objectFactory;
 
     /**
      * Array with the argument parsers
      * @var array
      */
-    protected static $argumentParsers;
+    protected $argumentParsers;
 
     /**
      * Container of the injection dependencies
      * @var DependencyContainer
      */
-    protected static $container;
+    protected $container;
 
     /**
      * Created dependency instances
      * @var array
      */
-    protected static $instances;
+    protected $instances;
 
     /**
-     * Initializes the core argument parsers
+     * Constructs a new dependency injector
+     * @param zibo\library\dependency\DependencyContainer $container Container
+     * with dependency definitions
+     * @param zibo\library\ObjectFactory $objectFactory Creator of objects
      * @return null
      */
-    protected function initArgumentParsers() {
-    	self::$argumentParsers = array(
+    public function __construct(DependencyContainer $container = null, ObjectFactory $objectFactory = null) {
+        if (!$container) {
+            $container = new DependencyContainer();
+        }
+        if (!$objectFactory) {
+            $objectFactory = new ObjectFactory();
+        }
+
+        $this->objectFactory = $objectFactory;
+
+    	$this->argumentParsers = array(
     		self::TYPE_NULL => new NullArgumentParser(),
     		self::TYPE_SCALAR => new ScalarArgumentParser(),
     		self::TYPE_ARRAY => new ArrayArgumentParser(),
     		self::TYPE_DEPENDENCY => new DependencyArgumentParser(),
     		self::TYPE_CALL => new CallArgumentParser(),
     	);
+
+    	$this->container = $container;
+
+    	$this->instances = array();
     }
 
     /**
@@ -103,14 +119,10 @@ class DependencyInjector {
     		throw new DependencyException('Provided type is empty or not a string');
     	}
 
-    	if (!isset(self::$argumentParsers)) {
-    		$this->initArgumentParsers();
-    	}
-
     	if ($argumentParser) {
-    		self::$argumentParsers[$type] = $argumentParser;
-    	} elseif (isset(self::$argumentParsers[$type])) {
-    		unset(self::$argumentParsers[$type]);
+    		$this->argumentParsers[$type] = $argumentParser;
+    	} elseif (isset($this->argumentParsers[$type])) {
+    		unset($this->argumentParsers[$type]);
     	}
     }
 
@@ -119,11 +131,7 @@ class DependencyInjector {
      * @return array Array with the type as key and the argument parser as value
      */
     public function getArgumentParsers() {
-    	if (!isset(self::$argumentParsers)) {
-    		$this->initArgumentParsers();
-    	}
-
-    	return self::$argumentParsers;
+    	return $this->argumentParsers;
     }
 
     /**
@@ -133,10 +141,10 @@ class DependencyInjector {
      * @return null
      */
     public function setContainer(DependencyContainer $container, $clearInstances = false) {
-        self::$container = $container;
+        $this->container = $container;
 
         if ($clearInstances) {
-            self::$instances = null;
+            $this->instances = null;
         }
     }
 
@@ -145,13 +153,7 @@ class DependencyInjector {
      * @return zibo\core\dependency\InjectionDefinitionContainer
      */
     public function getContainer() {
-        if (self::$container) {
-            return self::$container;
-        }
-
-        self::$container = new DependencyContainer();
-
-        return self::$container;
+        return $this->container;
     }
 
     /**
@@ -160,11 +162,12 @@ class DependencyInjector {
      * @param object $instance Instance to set
      * @param string $interface Interface to set the instance for, if not provided
      * the class name of the instance will be used as interface
+     * @param string $id Id of the instance
      * @return null
      * @throws Exception if the provided instance is not a object
      * @throws Exception if the provided interface is empty or invalid
      */
-    public function setInstance($instance, $interface = null) {
+    public function setInstance($instance, $interface = null, $id = null) {
         if (!is_object($instance)) {
             throw new DependencyException('Provided instance is not an object');
         }
@@ -177,10 +180,14 @@ class DependencyInjector {
             $interface = get_class($instance);
         }
 
-        if (!isset(self::$instances)) {
-            self::$instances = array($interface => $instance);
+        if ($id) {
+            $instance = array($id => $instance);
+        }
+
+        if (!isset($this->instances)) {
+            $this->instances = array($interface => $instance);
         } else {
-            self::$instances[$interface] = $instance;
+            $this->instances[$interface] = $instance;
         }
     }
 
@@ -193,8 +200,7 @@ class DependencyInjector {
     public function getAll($interface) {
         $interfaceDependencies = array();
 
-        $container = $this->getContainer();
-        $dependencies = $container->getDependencies($interface);
+        $dependencies = $this->container->getDependencies($interface);
         foreach ($dependencies as $dependency) {
             $id = $dependency->getId();
             $interfaceDependencies[$id] = $this->get($interface, $id);
@@ -226,9 +232,9 @@ class DependencyInjector {
             throw new DependencyException('Provided class name is empty or invalid');
         }
 
-        if (isset(self::$instances[$interface]) && !is_array(self::$instances[$interface]) && $arguments === null) {
+        if (isset($this->instances[$interface]) && !is_array($this->instances[$interface]) && $arguments === null) {
             // an instance of this interface is manually set, return it
-            return self::$instances[$interface];
+            return $this->instances[$interface];
         }
 
         $container = $this->getContainer();
@@ -242,9 +248,9 @@ class DependencyInjector {
                 throw new DependencyException('Provided id of the injection dependency is empty or invalid');
             }
 
-            if (isset(self::$instances[$interface][$id]) && $arguments === null) {
+            if (isset($this->instances[$interface][$id]) && $arguments === null) {
                 // the instance is already created
-                return self::$instances[$interface][$id];
+                return $this->instances[$interface][$id];
             }
 
             if (!isset($dependencies[$id])) {
@@ -253,9 +259,9 @@ class DependencyInjector {
 
             $dependency = $dependencies[$id];
         } else {
-            if ($arguments === null && isset(self::$instances[$interface])) {
+            if ($arguments === null && isset($this->instances[$interface])) {
                 // already a instance of the interface set
-                $instances = array_reverse(self::$instances[$interface]);
+                $instances = array_reverse($this->instances[$interface]);
 
                 // gets the last created dependency which is not excluded
                 do {
@@ -302,14 +308,19 @@ class DependencyInjector {
             return $instance;
         }
 
-        // index this interface
-        if (!isset(self::$instances[$interface])) {
-            self::$instances[$interface] = array();
-        } elseif (!isset(self::$instances)) {
-            self::$instances = array($interface => array());
-        }
+        $interfaces = $dependency->getInterfaces();
+        $interfaces[$interface] = true;
 
-        self::$instances[$interface][$id] = $instance;
+        foreach ($interfaces as $interface => $null) {
+            // index this interface
+            if (!isset($this->instances[$interface])) {
+                $this->instances[$interface] = array();
+            } elseif (!isset($this->instances)) {
+                $this->instances = array($interface => array());
+            }
+
+            $this->instances[$interface][$id] = $instance;
+        }
 
         return $instance;
     }
@@ -325,10 +336,6 @@ class DependencyInjector {
      * @throws Exception when the dependency could not be created
      */
     protected function create($interface, Dependency $dependency, array $arguments = null, array $exclude = null) {
-        if (!self::$objectFactory) {
-            self::$objectFactory = new ObjectFactory();
-        }
-
         if (!$exclude) {
             $exclude = array($interface => array($dependency->getId() => true));
         } elseif (!isset($exclude[$interface])) {
@@ -337,11 +344,7 @@ class DependencyInjector {
             $exclude[$interface][$dependency->getId()] = true;
         }
 
-        if (!isset(self::$argumentParsers)) {
-            $this->initArgumentParsers();
-        }
-
-        foreach (self::$argumentParsers as $argumentParser) {
+        foreach ($this->argumentParsers as $argumentParser) {
             if ($argumentParser instanceof InjectableArgumentParser) {
                 $argumentParser->setDependencyInjector($this);
                 $argumentParser->setExclude($exclude);
@@ -351,7 +354,7 @@ class DependencyInjector {
         $className = $dependency->getClassName();
         $constructorArguments = $dependency->getConstructorArguments();
 
-        $instanceArguments = self::$objectFactory->getArguments($className);
+        $instanceArguments = $this->objectFactory->getArguments($className);
 
         $constructorArguments = $this->getCallbackArguments($constructorArguments, $exclude);
         $constructorArguments = $this->parseArguments($constructorArguments, $instanceArguments);
@@ -363,7 +366,7 @@ class DependencyInjector {
             $invokeCalls = true;
         }
 
-        $instance = self::$objectFactory->create($className, $interface, !$arguments ? null : $arguments);
+        $instance = $this->objectFactory->create($className, $interface, !$arguments ? null : $arguments);
 
         if (!$invokeCalls) {
             return $instance;
@@ -396,7 +399,7 @@ class DependencyInjector {
             if (isset($arguments[$argumentName]) || array_key_exists($argumentName, $arguments) !== false) {
                 $definedArguments[$argumentName] = $arguments[$argumentName];
                 unset($arguments[$argumentName]);
-            } elseif ($argumentType == 'array') {
+            } elseif ($argumentType == self::TYPE_ARRAY) {
                 $definedArguments[$argumentName] = array();
             } elseif ($argumentType) {
                 $definedArguments[$argumentName] = null;
@@ -440,11 +443,11 @@ class DependencyInjector {
 
         foreach ($arguments as $name => $argument) {
         	$type = $argument->getType();
-        	if (!isset(self::$argumentParsers[$type])) {
+        	if (!isset($this->argumentParsers[$type])) {
         		throw new DependencyException('No argument parser set for type ' . $type);
         	}
 
-        	$callArguments[$name] = self::$argumentParsers[$type]->getValue($argument);
+        	$callArguments[$name] = $this->argumentParsers[$type]->getValue($argument);
         }
 
         return $callArguments;

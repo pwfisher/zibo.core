@@ -44,14 +44,21 @@ With this definition, the class can be used in the singleton pattern or in the f
 
 To define a implementation of a interface, you can use the following dependency definition: 
     
-    <dependency interface="zibo\core\console\input\Input" class="zibo\core\console\input\ReadlineInput" id="shell" />
+    <dependency class="zibo\core\console\input\ReadlineInput" interface="zibo\core\console\input\Input" id="shell" />
+
+When your dependency implements more then one interface, you can define them in the tag:
     
+    <dependency class="some\Class" id="class">
+        <interface name="some\InterfaceA" />
+        <interface name="some\InterfaceB" />
+    </dependency>
+
 _Note: The id attribute is optional but advised._
 
-### Calls
+### Method Calls
 
 In most cases, you will have to pass arguments to the constructors or invoke some methods before the instance is ready to use.
-You can obtain this by adding calls to your definition.
+You can obtain this by adding method calls to your definition.
 
 A call consists of the method name and optionally some argument definitions.
 You have different type of arguments.
@@ -126,3 +133,35 @@ Define the id of your dependency as a parameter:
     </dependency>
     
 When the parameter is not set, null is used as id and the last defined dependency of the interface is used.
+
+### Extending Dependencies
+
+Assume the following configuration on a low level in the hierarchic directory structure:
+
+    <dependency interface="lib\Authenticator" class="vendorA\SomeAuthenticator" id="vendorA">
+    
+    <dependency interface="lib\Authenticator" class="lib\ChainedAuthenticator" id="chain">
+        <call method="addAuthenticator">
+            <argument name="authenticator" type="dependency">
+                <property name="interface" value="lib\Authenticator" />
+                <property name="id" value="vendorA" />
+            </argument>
+        </call>
+    </dependency>
+    
+On a higher level in the configuration, you can use:    
+    
+    <dependency interface="lib\Authenticator" class="vendorB\SomeAuthenticator" id="vendorB">
+    
+    <dependency interface="lib\Authenticator" extends="chain" id="chain">
+        <call method="addAuthenticator">
+            <argument name="authenticator" type="dependency">
+                <property name="interface" value="lib\Authenticator" />
+                <property name="id" value="vendorB" />
+            </argument>
+        </call>
+    </dependency>    
+    
+Your Authenticator with id chain will now contain the authenticators of vendorA and vendorB.
+
+_Note: The id is reassigned in order to actually extend it, if you omit it, you will create a new dependency based on chain._

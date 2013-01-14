@@ -26,27 +26,29 @@ class DependencyContainer {
 
     /**
      * Adds a dependency for the provided class to this container
-     * @param string $interface A full class name
      * @param Dependency $dependency
      * @return null
      * @throws Exception when the provided interface is a invalid value
      */
-    public function addDependency($interface, Dependency $dependency) {
-        if (!is_string($interface) || !$interface) {
-            throw new DependencyException('Provided interface name is invalid');
+    public function addDependency(Dependency $dependency) {
+        $interfaces = $dependency->getInterfaces();
+        if (!$interfaces) {
+            throw new DependencyException('Could not add the dependency: no interfaces set in the provided dependency');
         }
 
-        if (!isset($this->dependencies[$interface])) {
-            $this->dependencies[$interface] = array();
-        }
+        foreach ($interfaces as $interface => $null) {
+            if (!isset($this->dependencies[$interface])) {
+                $this->dependencies[$interface] = array();
+            }
 
-        $id = $dependency->getId();
-        if (!$id) {
-            $id = 'd' . count($this->dependencies[$interface]);
-            $dependency->setId($id);
-        }
+            $id = $dependency->getId();
+            if (!$id) {
+                $id = 'd' . count($this->dependencies[$interface]);
+                $dependency->setId($id);
+            }
 
-        $this->dependencies[$interface][$id] = $dependency;
+            $this->dependencies[$interface][$id] = $dependency;
+        }
     }
 
     /**
