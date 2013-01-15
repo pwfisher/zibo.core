@@ -28,6 +28,7 @@ class WebController extends AbstractController {
         if (empty($path)) {
             // no path provided
             $this->response->setStatusCode(Response::STATUS_CODE_BAD_REQUEST);
+
             return;
         }
 
@@ -37,33 +38,28 @@ class WebController extends AbstractController {
         if (!$file) {
             // file not found, set status code
             $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
+
             return;
         }
 
         if ($file->getExtension() == 'php') {
             // the file is a PHP script, execute it
             require_once($file->getAbsolutePath());
+
             return;
         }
 
-        // get needed file properties
         $fileModificationTime = $file->getModificationTime();
         $fileSize = $file->getSize();
-
-        // set cache headers
         $eTag = md5($path . '-' . $fileModificationTime . '-' . $fileSize);
-        $maxAge = 3600; // an hour
-        $expirationTime = time() + $maxAge;
 
         $this->response->setETag($eTag);
         $this->response->setLastModified($fileModificationTime);
-        $this->response->setExpires($expirationTime);
-        $this->response->setMaxAge($maxAge);
-        $this->response->setSharedMaxAge($maxAge);
 
         if ($this->response->isNotModified($this->request)) {
             // content is not modified, stop processing
             $this->response->setNotModified();
+
             return;
         }
 
@@ -85,7 +81,7 @@ class WebController extends AbstractController {
      * @return null|zibo\library\filesystem\File
      */
     protected function getFile($path) {
-        $plainPath = new File(Zibo::DIRECTORY_WEB . File::DIRECTORY_SEPARATOR . $path);
+        $plainPath = new File(Zibo::DIRECTORY_PUBLIC . File::DIRECTORY_SEPARATOR . $path);
 
         $file = $this->zibo->getFile($plainPath);
         if ($file) {

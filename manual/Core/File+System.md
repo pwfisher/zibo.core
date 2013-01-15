@@ -9,6 +9,17 @@ Use the _File_ object to read a absolute file or a file relative to the running 
         $contents = $file->read();
     }
 
+## Read A Public File
+
+Use _Zibo_ to look for a file relative to the public directory structure. 
+Zibo will look first in the configured public directory, then as a relative file in the _public_ directory. 
+When your file is found, Zibo will stop looking and return the file. 
+
+    $file = $zibo->getPublicFile('img/someimage.png');
+    if ($file) {
+        // ...
+    }
+
 ## Read A Relative File
 
 Use _Zibo_ to look for a file relative to the directory structure. 

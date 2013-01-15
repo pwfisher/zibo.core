@@ -16,7 +16,7 @@ class DependencySearchCommand extends AbstractCommand {
      */
     public function __construct() {
         parent::__construct('dependency', 'Show an overview of the defined dependencies');
-        $this->addArgument('query', 'Query to search the routes', false, true);
+        $this->addArgument('query', 'Query to search the dependencies', false, true);
     }
 
     /**

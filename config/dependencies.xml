@@ -82,6 +82,8 @@
         </call>
     </dependency>    
     
+    <dependency interface="zibo\library\mvc\controller\Controller" class="zibo\core\mvc\controller\WebController" id="web" />
+    
     <dependency interface="zibo\library\mvc\dispatcher\Dispatcher" class="zibo\core\mvc\dispatcher\ZiboDispatcher" id="core">
         <call method="__construct">
             <argument name="zibo" type="dependency">

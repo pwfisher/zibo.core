@@ -41,7 +41,7 @@ log files (only in application)
 * __manual__  
 sources of the manual documentation pages
 * __public__  
-resources hosted directly by the webserver
+resources for the document root of the webserver
 * __src__  
 sources of the implementation; the PHP files
 * __test__  
@@ -50,5 +50,3 @@ a nested module directory structure
 external vendor libraries
 * __view__  
 templates of the views
-* __web__  
-resources open to the world but hosted by Zibo

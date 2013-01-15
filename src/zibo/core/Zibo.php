@@ -107,12 +107,6 @@ class Zibo {
     const DIRECTORY_VIEW = 'view';
 
     /**
-     * Name of the web directory
-     * @var string
-     */
-    const DIRECTORY_WEB = 'web';
-
-    /**
      * Name of the event run when an exception occurs
      * @var string
      */
@@ -318,9 +312,20 @@ class Zibo {
     }
 
     /**
+     * Gets a file from the public directory structure
+     * @param string $file Relative path to the public directory structure
+     * @return zibo\library\filesystem\File|null Instance of the file if found,
+     * null otherwise
+     */
+    public function getPublicFile($file) {
+        return $this->environment->getFileBrowser()->getPublicFile($file);
+    }
+
+    /**
      * Gets a file from the file system structure
      * @param string $file File name relative to the file system structure
-     * @return zibo\library\filesystem\File
+     * @return zibo\library\filesystem\File|null Instance of the file if found,
+     * null otherwise
      */
     public function getFile($file) {
         return $this->environment->getFileBrowser()->getFile($file);
@@ -648,6 +653,23 @@ class Zibo {
             // keep the initial request for the response
             $request = $this->getRequest();
 
+            if (!$request && $this->response->getStatusCode() == Response::STATUS_CODE_OK && !$this->response->getView() && !$this->response->getBody()) {
+                // there is no request to start the dispatch, forward to the web controller
+                $method = $httpRequest->getMethod();
+                if ($method == Request::METHOD_GET || $method == Request::METHOD_HEAD) {
+                    $controller = $this->getDependency('zibo\\library\\mvc\\controller\\Controller', 'web');
+                    $callback = array($controller, 'indexAction');
+
+                    $route = new Route('/', $callback);
+                    $route->setIsDynamic(true);
+                    $route->setArguments(explode('/', ltrim($httpRequest->getBasePath(), '/')));
+
+                    $this->setRequest(new Request($httpRequest, $route, $this->dependencyInjector));
+                } else {
+                    $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
+                }
+            }
+
             $this->dispatch();
 
             if ($request) {
@@ -752,12 +774,6 @@ class Zibo {
      */
     protected function dispatch() {
         if (!$this->request) {
-            if ($this->response->getStatusCode() == Response::STATUS_CODE_OK && !$this->response->getView() && !$this->response->getBody()) {
-                // there is no request to start with, so we just return the
-                // appropriate HTTP response status code
-                $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
-            }
-
             return;
         }
 

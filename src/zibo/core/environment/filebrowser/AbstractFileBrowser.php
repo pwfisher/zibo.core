@@ -173,6 +173,23 @@ abstract class AbstractFileBrowser implements FileBrowser {
     }
 
     /**
+     * Gets the first file in the public directory structure
+     * @param string $file Relative path
+     * @return zibo\library\filesystem\File|null Instance of the file if found,
+     * null otherwise
+     */
+    public function getPublicFile($file) {
+        $fileName = ltrim($file, '/');
+
+        $file = new File($this->publicDirectory, $fileName);
+        if ($file->exists()) {
+            return $file;
+        }
+
+        return $this->getFile(Zibo::DIRECTORY_PUBLIC . '/' . $fileName);
+    }
+
+    /**
      * Gets the first file in the Zibo filesystem structure according to the
      * provided path.
      * @param string $file Relative path of a file in the Zibo filesystem

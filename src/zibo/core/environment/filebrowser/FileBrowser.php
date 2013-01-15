@@ -43,6 +43,14 @@ interface FileBrowser {
     public function getRelativeFile($file);
 
     /**
+     * Gets the first file in the public directory structure
+     * @param string $file Relative path
+     * @return zibo\library\filesystem\File|null Instance of the file if found,
+     * null otherwise
+     */
+    public function getPublicFile($file);
+
+    /**
      * Gets the first file in the Zibo filesystem structure according to the
      * provided path.
      * @param string $file Relative path of a file in the Zibo filesystem
