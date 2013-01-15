@@ -12,6 +12,7 @@
         <element name="dependency">
             <ref name="attlist.dependency"/>
             <zeroOrMore>
+                <ref name="interface"/>
                 <ref name="call"/>
             </zeroOrMore>
         </element>
@@ -43,6 +44,18 @@
                 <attribute name="extends" />
             </group>
         </choice>    
+    </define>
+
+    <define name="interface">
+        <element name="interface">
+            <ref name="attlist.interface"/>
+        </element>
+    </define>
+
+    <define name="attlist.interface">
+        <group>
+            <attribute name="name" />
+        </group>
     </define>
 
     <define name="call">

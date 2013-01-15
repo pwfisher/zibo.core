@@ -122,7 +122,6 @@ class CachedRouteContainerIO implements RouteContainerIO {
         $routes = $container->getRoutes();
         foreach ($routes as $route) {
             $callback = $route->getCallback();
-            $callback = array($callback->getClass(), $callback->getMethod());
 
             $allowedMethods = $route->getAllowedMethods();
             if ($allowedMethods) {
