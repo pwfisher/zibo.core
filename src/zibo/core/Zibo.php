@@ -344,6 +344,7 @@ class Zibo {
      * Gets the relative file in the Zibo file structure for a given path.
      * @param string|zibo\library\filesystem\File $file File to get the
      * relative file from
+     * @param boolean $public Set to true to check the public directory as well
      * @return zibo\library\filesystem\File relative file in the Zibo file
      * structure if located in the root of the Zibo installation
      * @throws zibo\library\filesystem\exception\FilesystemException when the
@@ -351,8 +352,8 @@ class Zibo {
      * @throws zibo\library\filesystem\exception\FileSystemException when the
      * provided file is part of the Zibo file system structure
      */
-    public function getRelativeFile($file) {
-        return $this->environment->getFileBrowser()->getRelativeFile($file);
+    public function getRelativeFile($file, $public = false) {
+        return $this->environment->getFileBrowser()->getRelativeFile($file, $public);
     }
 
     /**

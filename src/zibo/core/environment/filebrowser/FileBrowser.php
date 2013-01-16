@@ -33,6 +33,7 @@ interface FileBrowser {
      * absolute file.
      * @param string|zibo\library\filesystem\File $file Path to a file to get
      * the relative file from
+     * @param boolean $public Set to true to check the public directory as well
      * @return zibo\library\filesystem\File relative file in the Zibo file
      * structure if located in the root of the Zibo installation
      * @throws zibo\library\filesystem\exception\FileSystemException when the
@@ -40,7 +41,7 @@ interface FileBrowser {
      * @throws zibo\library\filesystem\exception\FileSystemException when the
      * provided file is not part of the Zibo file system structure
      */
-    public function getRelativeFile($file);
+    public function getRelativeFile($file, $public);
 
     /**
      * Gets the first file in the public directory structure

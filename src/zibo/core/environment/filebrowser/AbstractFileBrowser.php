@@ -145,12 +145,13 @@ abstract class AbstractFileBrowser implements FileBrowser {
      * absolute file.
      * @param string|zibo\library\filesystem\File $file Path to a file to get
      * the relative file from
+     * @param boolean $public Set to true to check the public directory as well
      * @return zibo\library\filesystem\File relative file in the file system
      * structure
      * @throws zibo\library\filesystem\exception\FileSystemException when the
      * provided file is not part of the file system structure
      */
-    public function getRelativeFile($file) {
+    public function getRelativeFile($file, $public = false) {
         $file = new File($file);
         $absoluteFile = $file->getAbsolutePath();
 
@@ -167,6 +168,15 @@ abstract class AbstractFileBrowser implements FileBrowser {
             }
 
             return new File(str_replace($includeAbsolutePath . File::DIRECTORY_SEPARATOR, '', $absoluteFile));
+        }
+
+
+        if ($public) {
+            $publicAbsolutePath = $this->publicDirectory->getAbsolutePath();
+
+            if (strpos($absoluteFile, $publicAbsolutePath) === 0) {
+                return new File(str_replace($publicAbsolutePath . File::DIRECTORY_SEPARATOR, '', $absoluteFile));
+            }
         }
 
         throw new FileSystemException($file . ' is not in the file system structure');
