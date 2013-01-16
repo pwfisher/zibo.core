@@ -79,7 +79,7 @@ class Builder {
                 }
 
                 if ($name == Zibo::DIRECTORY_PUBLIC) {
-                    $directoryDestination = new File($this->public, $name);
+                    $directoryDestination = new File($this->public);
                 } else {
                     $directoryDestination = new File($this->application, $name);
                 }
@@ -173,6 +173,9 @@ class Builder {
 
         $this->application = new File($destination, self::DIRECTORY_APPLICATION);
         $this->application->create();
+
+        $log = new File($this->application, 'log');
+        $log->create();
 
         echo 'Created ' . $this->application . "\n";
 
