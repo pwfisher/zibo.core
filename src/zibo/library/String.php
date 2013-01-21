@@ -145,7 +145,7 @@ class String {
      * @return string Safe string for file names and URLs
      */
     public static function safeString($string, $replacement = '-', $lower = true) {
-    	if (!is_string($string) || !$string) {
+    	if ((!is_string($string) && !is_numeric($string)) || $string == '') {
     		throw new Exception('Provided string is invalid or empty');
     	}
 
