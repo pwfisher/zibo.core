@@ -6,8 +6,6 @@ use zibo\library\http\exception\HttpException;
 use zibo\library\http\Request;
 use zibo\library\http\Response;
 
-use \Exception;
-
 /**
  * cURL implementation of the HTTP client
  */
@@ -95,7 +93,7 @@ class CurlClient extends AbstractClient {
 
         $error = curl_error($curl);
         if ($error) {
-            throw new Exception('cURL returned error: ' . $error);
+            throw new HttpException('cURL returned error: ' . $error);
         }
 
         if ($this->log) {
