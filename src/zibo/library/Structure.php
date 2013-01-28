@@ -43,7 +43,7 @@ class Structure implements RecursiveIterator {
             $token = $this->checkToken($token, $name);
 
             $value = $this->getValue($token, $value);
-            if ($value == null) {
+            if ($value === null) {
                 return null;
             }
 
@@ -184,12 +184,16 @@ class Structure implements RecursiveIterator {
      * @param array $array2
      * @return array
      */
-    public static function merge(array $array1, array $array2) {
+    public static function merge(array $array1, array $array2, $nestedMerge = false) {
         $useKey = !array_key_exists(0, $array2);
 
         foreach ($array2 as $key => $value) {
             if ($useKey) {
-                $array1[$key] = $value;
+                if ($nestedMerge && isset($array1[$key]) && is_array($array1[$key]) && is_array($value)) {
+                    $array1[$key] = self::merge($array1[$key], $value, true);
+                } else {
+                    $array1[$key] = $value;
+                }
             } else {
                 $array1[] = $value;
             }

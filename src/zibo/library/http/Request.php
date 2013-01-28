@@ -202,7 +202,7 @@ class Request {
             throw new HttpException('Provided method is empty or not a string');
         }
 
-        $this->method = $method;
+        $this->method = strtoupper($method);
     }
 
     /**
@@ -211,6 +211,46 @@ class Request {
      */
     public function getMethod() {
         return $this->method;
+    }
+
+    /**
+     * Checks if this is a HEAD request
+     * @return boolean
+     */
+    public function isHead() {
+        return $this->method == self::METHOD_HEAD;
+    }
+
+    /**
+     * Checks if this is a GET request
+     * @return boolean
+     */
+    public function isGet() {
+        return $this->method == self::METHOD_GET;
+    }
+
+    /**
+     * Checks if this is a POST request
+     * @return boolean
+     */
+    public function isPost() {
+        return $this->method == self::METHOD_POST;
+    }
+
+    /**
+     * Checks if this is a PUT request
+     * @return boolean
+     */
+    public function isPut() {
+        return $this->method == self::METHOD_PUT;
+    }
+
+    /**
+     * Checks if this is a DELETE request
+     * @return boolean
+     */
+    public function isDelete() {
+        return $this->method == self::METHOD_DELETE;
     }
 
     /**
