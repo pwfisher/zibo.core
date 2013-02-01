@@ -62,6 +62,32 @@ class ObjectFactory {
     }
 
     /**
+     * Creates a data instance
+     * @param string $class Full name of the data class
+     * @param array $values Values for the data
+     * @return mixed Instance of the data object
+     */
+    public function createData($class, array $values) {
+        $arguments = $this->getArguments($class);
+        foreach ($arguments as $name => $type) {
+            if (isset($values[$name])) {
+                $arguments[$name] = $values[$name];
+                unset($values[$name]);
+            } else {
+                $arguments[$name] = null;
+            }
+        }
+
+        $data = $this->create($class, null, $arguments);
+
+        foreach ($values as $name => $value) {
+            $this->setProperty($name, $data, $value);
+        }
+
+        return $data;
+    }
+
+    /**
      * Gets the possible arguments for the constructor of the provided class
      * @param string $class Full name of the class
      * @return array Array with the name of the argument as key and the type
@@ -77,6 +103,56 @@ class ObjectFactory {
         }
 
         return Callback::parseReflectionArguments($arguments);
+    }
+
+
+    /**
+     * Gets a property of the provided data
+     * @param string $name Name of the property
+     * @param array|object $data Data container
+     * @return mixed Value of the property if found, null otherwise
+     */
+    public function getProperty($name, &$data) {
+        if (is_array($data)) {
+            if (isset($data[$name])) {
+                return $data[$name];
+            }
+
+            return null;
+        }
+
+        $methodName = 'get' . ucfirst($name);
+        if (method_exists($data, $methodName)) {
+            return $data->$methodName();
+        }
+
+        if (isset($data->$name)) {
+            return $data->$name;
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets a property to the provided data
+     * @param string $name Name of the property
+     * @param array|object $data Data container
+     * @param mixed $value Value for the property
+     * @return null
+     */
+    public function setProperty($name, &$data, $value) {
+        if (is_array($data)) {
+            $data[$name] = $value;
+
+            return;
+        }
+
+        $methodName = 'set' . ucfirst($name);
+        if (method_exists($data, $methodName)) {
+            $data->$methodName($value);
+        } else {
+            $data->$name= $value;
+        }
     }
 
 }
