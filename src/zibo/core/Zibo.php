@@ -2,6 +2,8 @@
 
 namespace zibo\core;
 
+use zibo\library\ObjectFactory;
+
 use zibo\core\environment\dependency\argument\CallArgumentParser;
 use zibo\core\environment\dependency\argument\ConfigArgumentParser;
 use zibo\core\environment\dependency\argument\DependencyArgumentParser;
@@ -405,12 +407,14 @@ class Zibo {
         $dependencyArgumentParser = new DependencyArgumentParser($config);
 
         $container = $this->environment->getDependencyContainer();
+        $objectFactory = new ObjectFactory();
 
-        $this->dependencyInjector = new DependencyInjector($container);
+        $this->dependencyInjector = new DependencyInjector($container, $objectFactory);
         $this->dependencyInjector->setArgumentParser(DependencyInjector::TYPE_CALL, $callArgumentParser);
         $this->dependencyInjector->setArgumentParser(DependencyInjector::TYPE_DEPENDENCY, $dependencyArgumentParser);
         $this->dependencyInjector->setArgumentParser('parameter', $configArgumentParser);
 
+        $this->dependencyInjector->setInstance($objectFactory);
         $this->dependencyInjector->setInstance($this);
         $this->dependencyInjector->setInstance($this->environment);
         $this->dependencyInjector->setInstance($this->environment->getConfig());
