@@ -12,6 +12,7 @@ use zibo\core\console\command\ParameterGetCommand;
 use zibo\core\console\command\ParameterSearchCommand;
 use zibo\core\console\command\ParameterSetCommand;
 use zibo\core\console\command\ParameterUnsetCommand;
+use zibo\core\console\command\PhpCommand;
 use zibo\core\console\command\RouterRegisterCommand;
 use zibo\core\console\command\RouterRouteCommand;
 use zibo\core\console\command\RouterSearchCommand;
@@ -127,10 +128,11 @@ class Console {
                 continue;
             }
 
-            try {
-                $this->interpreter->interpret($input, $this->output);
-            } catch (CommandNotFoundException $e) {
-            	// command not found, process as PHP code
+            if (strlen($input) > 4 && substr($input, 0, 4) == 'php ') {
+                // implement the php command straight in the console in order to
+                // create/use a context
+                $input = substr($input, 4);
+
                 if (substr($input, -1) != ';') {
                     $input .= ';';
                 }
@@ -143,15 +145,21 @@ class Console {
                         $this->output->write($exception->getTraceAsString());
                     }
                 }
-            } catch (Exception $exception) {
-                $message = $exception->getMessage();
-                if (!$message) {
-                    $message = get_class($exception);
-                }
+            } else {
+                try {
+                    $this->interpreter->interpret($input, $this->output);
+                } catch (CommandNotFoundException $e) {
+                    $this->output->write('Command not found: ' . $input);
+                } catch (Exception $exception) {
+                    $message = $exception->getMessage();
+                    if (!$message) {
+                        $message = get_class($exception);
+                    }
 
-                $this->output->write('Error: ' . $message);
-                if ($this->isDebug) {
-                    $this->output->write($exception->getTraceAsString());
+                    $this->output->write('Error: ' . $message);
+                    if ($this->isDebug) {
+                        $this->output->write($exception->getTraceAsString());
+                    }
                 }
             }
         } while ($input != ExitCommand::NAME);
@@ -175,6 +183,7 @@ class Console {
         $this->interpreter->registerCommand(new ParameterSearchCommand());
         $this->interpreter->registerCommand(new ParameterSetCommand());
         $this->interpreter->registerCommand(new ParameterUnsetCommand());
+        $this->interpreter->registerCommand(new PhpCommand());
         $this->interpreter->registerCommand(new RouterRegisterCommand());
         $this->interpreter->registerCommand(new RouterRouteCommand());
         $this->interpreter->registerCommand(new RouterSearchCommand());

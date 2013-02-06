@@ -84,7 +84,7 @@ class HelpCommand extends AbstractCommand {
 
         $output->write('Zibo ' . Zibo::VERSION . ' console (' . $environment . ').');
         $output->write('');
-        $output->write('The Zibo console can be used to run maintenance tasks on your installation. When a command is not found, the input will be evaluated by the PHP interpreter.');
+        $output->write('The Zibo console can be used to run maintenance tasks on your installation.');
         $output->write('');
         $output->write('Available flags:');
         $output->write('- --debug  Show the full stack trace of runtime exceptions.');

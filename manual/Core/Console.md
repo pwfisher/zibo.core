@@ -14,9 +14,6 @@ You can run the console as a interactive shell:
     
 The interactive shell has tab auto completion and a input history. 
 
-When a command is not found, the input will be evaluated by the PHP interpreter. 
-This can be useful for console scripts or for debugging. 
-
 ## Register A Command
 
 ### Through Dependencies
