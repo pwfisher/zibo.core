@@ -16,6 +16,18 @@ use zibo\library\log\Log;
 abstract class AbstractClient implements Client {
 
     /**
+     * Basic authentication method
+     * @var string
+     */
+    const AUTHENTICATION_METHOD_BASIC = 'basic';
+
+    /**
+     * Digest authentication method
+     * @var string
+     */
+    const AUTHENTICATION_METHOD_DIGEST = 'digest';
+
+    /**
      * Source for the log messages
      * @var string
      */
@@ -26,6 +38,12 @@ abstract class AbstractClient implements Client {
      * @var zibo\library\log\Log
      */
     protected $log;
+
+    /**
+     * Name of the authentication method
+     * @var string
+     */
+    protected $authenticationMethod;
 
     /**
      * Username for the last created request
@@ -51,12 +69,14 @@ abstract class AbstractClient implements Client {
     /**
      * Performs a DELETE request to the provided URL
      * @param string $url URL of the request
+     * @param string|array $body Body variables as a url encoded string or
+     * an array with key value pairs
      * @param array $headers Array with the headers of the request
      * @return zibo\library\http\Response
      */
-    public function delete($url, array $headers = null) {
+    public function delete($url, $body = null, array $headers = null) {
         $headers = $this->createHeaderContainer($headers);
-        $request = $this->createRequest(Request::METHOD_DELETE, $url, $headers);
+        $request = $this->createRequest(Request::METHOD_DELETE, $url, $headers, $body);
 
         return $this->sendRequest($request);
     }
@@ -90,12 +110,12 @@ abstract class AbstractClient implements Client {
     /**
      * Performs a POST request to the provided URL
      * @param string $url URL of the request
-     * @param string|array $post Body variables as a url encoded string or
+     * @param string|array $body Body variables as a url encoded string or
      * an array with key value pairs
      * @param array $headers Array with the headers of the request
      * @return zibo\library\http\Response
      */
-    public function post($url, $body, array $headers = null) {
+    public function post($url, $body = null, array $headers = null) {
         $headers = $this->createHeaderContainer($headers);
         $request = $this->createRequest(Request::METHOD_POST, $url, $headers, $body);
 
@@ -110,11 +130,32 @@ abstract class AbstractClient implements Client {
      * @param array $headers Array with the headers of the request
      * @return zibo\library\http\Response
      */
-    public function put($url, $body, array $headers = null) {
+    public function put($url, $body = null, array $headers = null) {
         $headers = $this->createHeaderContainer($headers);
         $request = $this->createRequest(Request::METHOD_PUT, $url, $headers, $body);
 
         return $this->sendRequest($request);
+    }
+
+    /**
+     * Sets the authentication method
+     * @param string $method Authentication method eg. Basic, Digest ...
+     * @return null
+     */
+    public function setAuthenticationMethod($method) {
+        $this->authenticationMethod = $method;
+    }
+
+    /**
+     * Gets the authentication method
+     * @return string
+     */
+    public function getAuthenticationMethod() {
+        if (!$this->authenticationMethod) {
+            return self::AUTHENTICATION_METHOD_BASIC;
+        }
+
+        return $this->authenticationMethod;
     }
 
     /**
@@ -159,16 +200,16 @@ abstract class AbstractClient implements Client {
             $path = '/';
         }
 
-        if (isset($vars['user'])) {
-            $this->username = $vars['user'];
-        }
-
-        if (isset($vars['pass'])) {
-            $this->password = $vars['pass'];
-        }
-
         if (isset($vars['host'])) {
             $headers->setHeader(Header::HEADER_HOST, $vars['host'], true);
+        }
+
+        if (isset($vars['user'])) {
+            $this->username = $vars['user'];
+            $this->password = $vars['pass'];
+        } else {
+            $this->username = null;
+            $this->password = null;
         }
 
         if (isset($vars['query'])) {

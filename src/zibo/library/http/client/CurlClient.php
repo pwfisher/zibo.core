@@ -82,11 +82,36 @@ class CurlClient extends AbstractClient {
             $options[CURLOPT_POSTFIELDS] = $request->getBody();
         }
 
+        if ($this->username) {
+            $method = $this->getAuthenticationMethod();
+
+            switch (strtolower($method)) {
+                case self::AUTHENTICATION_METHOD_BASIC:
+                    $options[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+
+                    break;
+                case self::AUTHENTICATION_METHOD_DIGEST:
+                    $options[CURLOPT_HTTPAUTH] = CURLAUTH_DIGEST;
+
+                    break;
+                default:
+                    throw new HttpException('Could not send the request: invalid authentication method set (' . $method . ')');
+
+                    break;
+            }
+
+            $options[CURLOPT_USERPWD] = $this->username . ':' . $this->password;
+        }
+
         $curl = curl_init();
         curl_setopt_array($curl, $options);
 
         if ($this->log) {
             $this->log->logDebug('Sending ' . ($request->isSecure() ? 'secure ' : '') . 'request', $request, self::LOG_SOURCE);
+
+            if ($this->username) {
+                $this->log->logDebug('Authorization', $method . ' ' . $this->username, self::LOG_SOURCE);
+            }
         }
 
         $responseString = curl_exec($curl);

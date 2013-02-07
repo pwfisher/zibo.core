@@ -457,7 +457,17 @@ class Request {
 
         try {
             if ($body) {
-                $this->bodyParameters = self::parseQueryString($body);
+                $contentType = $this->getHeader(Header::HEADER_CONTENT_TYPE);
+                switch ($contentType) {
+                    case 'application/json':
+                        $this->bodyParameters = json_decode($body);
+
+                        break;
+                    default:
+                        $this->bodyParameters = self::parseQueryString($body);
+
+                        break;
+                }
             } else {
                 $this->bodyParameters = array();
             }

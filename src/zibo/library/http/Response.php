@@ -712,10 +712,11 @@ class Response {
         $body = '';
         while ($lines) {
             $line = array_shift($lines);
-            $body .= $line;
+            $body .= $line . $lineBreak;
         }
 
         $response->setBody($body);
+
         return $response;
     }
 

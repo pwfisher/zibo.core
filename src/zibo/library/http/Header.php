@@ -56,6 +56,12 @@ class Header {
     const HEADER_AUTHENTICATE = 'WWW-Authenticate';
 
     /**
+     * Header name for HTTP authorization
+     * @var string
+     */
+    const HEADER_AUTHORIZATION = 'Authorization';
+
+    /**
      * Name of the cache control header
      * @var string
      */
