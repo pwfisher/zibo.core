@@ -22,6 +22,12 @@ class Response {
     const STATUS_CODE_CREATED = 201;
 
     /**
+     * HTTP status code for a no content status
+     * @var int
+     */
+    const STATUS_CODE_NO_CONTENT = 204;
+
+    /**
      * HTTP status code for a moved permanently status
      * @var int
      */
@@ -80,6 +86,12 @@ class Response {
      * @var int
      */
     const STATUS_CODE_NOT_IMPLEMENTED = 501;
+
+    /**
+     * HTTP status code
+     * @var unknown_type
+     */
+    const STATUS_CODE_SERVICE_UNAVAILABLE = 503;
 
     /**
      * The HTTP response status code

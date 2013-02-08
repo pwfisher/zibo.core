@@ -917,6 +917,9 @@ class Zibo {
 
         $domain = $this->request->getHeader(Header::HEADER_HOST);
         $path = str_replace($this->request->getServerUrl(), '', $this->request->getBaseUrl());
+        if (!$path) {
+            $path = '/';
+        }
 
         $cookie = new Cookie($cookieName, $session->getId(), $expires, $domain, $path);
         $this->response->setCookie($cookie);

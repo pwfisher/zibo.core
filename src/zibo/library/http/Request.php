@@ -455,24 +455,13 @@ class Request {
             return;
         }
 
-        try {
-            if ($body) {
-                $contentType = $this->getHeader(Header::HEADER_CONTENT_TYPE);
-                switch ($contentType) {
-                    case 'application/json':
-                        $this->bodyParameters = json_decode($body);
-
-                        break;
-                    default:
-                        $this->bodyParameters = self::parseQueryString($body);
-
-                        break;
-                }
-            } else {
-                $this->bodyParameters = array();
+        if ($body) {
+            $contentType = $this->getHeader(Header::HEADER_CONTENT_TYPE);
+            if ($contentType == 'application/json') {
+                $this->bodyParameters = json_decode($body);
+            } elseif ($contentType == 'application/x-www-form-urlencoded') {
+                $this->bodyParameters = self::parseQueryString($body);
             }
-        } catch (Exception $exception) {
-
         }
 
         $this->body = $body;
@@ -484,7 +473,12 @@ class Request {
      */
     public function getBody() {
     	if (!$this->body && $this->bodyParameters) {
-            $this->body = $this->getBodyParametersAsString();
+            $contentType = $this->getHeader(Header::HEADER_CONTENT_TYPE);
+            if ($contentType == 'application/json') {
+                $this->body = json_encode($this->bodyParameters);
+            } elseif ($contentType == 'application/x-www-form-urlencoded') {
+                $this->body = $this->getBodyParametersAsString();
+            }
     	}
 
         return $this->body;

@@ -76,10 +76,9 @@ class CurlClient extends AbstractClient {
             }
         }
 
-        if ($request->getBodyParameters()) {
-            $options[CURLOPT_POSTFIELDS] = $request->getBodyParametersAsString();
-        } elseif ($request->getBody()) {
-            $options[CURLOPT_POSTFIELDS] = $request->getBody();
+        $body = $request->getBody();
+        if ($body) {
+            $options[CURLOPT_POSTFIELDS] = $body;
         }
 
         if ($this->username) {
