@@ -332,7 +332,7 @@ class Deployer {
      * @return null
      */
     protected function syncFiles($source, $destination) {
-        $command = 'rsync -urltD ';
+        $command = 'rsync -urltDp ';
         if ($this->sshKey) {
             $command .= '-e "ssh -i ' . $this->sshKey . '" ';
         }

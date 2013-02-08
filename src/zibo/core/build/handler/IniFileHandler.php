@@ -51,6 +51,7 @@ class IniFileHandler implements FileHandler {
         $output = '';
         foreach ($ini as $key => $value) {
             $value = trim($value);
+            $value = str_replace('"', '\\"', $value);
 
             if (!(substr($value, 0, 1) == '"' && substr($value, -1) == '"')) {
                 $value = '"' . $value . '"';
