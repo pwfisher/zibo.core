@@ -127,11 +127,11 @@ class String {
 
         $i = 0;
         while ($i < $length) {
-            $char = substr($haystack, mt_rand(0, $haystackLength - 1), 1);
-            if (!strstr($string, $char)) {
-                $string .= $char;
-                $i++;
-            }
+            $index = mt_rand(0, $haystackLength - 1);
+
+            $string .= $haystack[$index];
+
+            $i++;
         }
 
         return $string;
