@@ -114,8 +114,8 @@ class Value {
         }
 
         if (is_object($value)) {
-            if (isset($value->$fieldName)) {
-                return $value->$fieldName;
+            if (isset($value->$property)) {
+                return $value->$property;
             }
         }
 

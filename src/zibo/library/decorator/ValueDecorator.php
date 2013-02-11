@@ -57,8 +57,9 @@ class ValueDecorator implements Decorator {
      */
     public function decorate($value) {
         $value = $this->getValue($value);
+        $value = $this->decorateValue($value);
 
-        return $this->decorateValue($value);
+        return $value;
     }
 
     /**
@@ -78,7 +79,7 @@ class ValueDecorator implements Decorator {
      * @return mixed Value of the set field in the initial decorate value
      */
     protected function getValue($value) {
-        return $this->helper->getProperty($value, $this->property);
+        return $this->helper->getProperty($value, $this->fieldName, $value);
     }
 
 }
