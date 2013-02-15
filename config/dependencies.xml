@@ -92,6 +92,39 @@
         </call>
     </dependency>
     
+    <dependency interface="zibo\core\event\loader\io\EventIO" class="zibo\core\event\loader\io\ConfigEventIO" id="config">
+        <call method="__construct">
+            <argument name="fileBrowser" type="dependency">
+                <property name="interface" value="zibo\core\environment\filebrowser\FileBrowser" />
+            </argument>
+        </call>
+    </dependency>
+    
+    <dependency interface="zibo\core\event\loader\EventLoader" class="zibo\core\event\loader\GenericEventLoader" id="generic">
+        <call method="__construct">
+            <argument name="io" type="dependency">
+                <property name="interface" value="zibo\core\event\loader\io\EventIO" />
+            </argument>
+            <argument name="zibo" type="dependency">
+                <property name="interface" value="zibo\core\Zibo" />
+            </argument>
+        </call>
+    </dependency>
+
+    <dependency class="zibo\core\event\EventManager" id="core">
+        <call method="setLoader">
+            <argument name="loader" type="dependency">
+                <property name="interface" value="zibo\core\event\loader\EventLoader" />
+            </argument>
+        </call>
+        <call method="setLog">
+            <argument name="log" type="call">
+                <property name="interface" value="zibo\core\Zibo" />
+                <property name="method" value="getLog" />
+            </argument>
+        </call>
+    </dependency>
+    
     <dependency interface="zibo\core\router\RouteContainerIO" class="zibo\core\router\XmlRouteContainerIO" id="core">
         <call method="__construct">
             <argument name="environment" type="dependency">

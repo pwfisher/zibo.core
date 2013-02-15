@@ -2,6 +2,8 @@
 <container>
     <dependency interface="zibo\core\build\handler\FileHandler" class="zibo\core\build\handler\DefaultFileHandler" id="default" />
     
+    <dependency interface="zibo\core\build\handler\FileHandler" class="zibo\core\build\handler\ConfFileHandler" id="config.conf" />
+    
     <dependency interface="zibo\core\build\handler\FileHandler" class="zibo\core\build\handler\ConfigIniFileHandler" id="config.ini" />
     
     <dependency interface="zibo\core\build\handler\FileHandler" class="zibo\core\build\handler\XmlFileHandler" id="config.xml" />
@@ -13,6 +15,15 @@
             <argument name="defaultFileHandler" type="dependency">
                 <property name="interface" value="zibo\core\build\handler\FileHandler" />
                 <property name="id" value="default" />
+            </argument>
+        </call>
+        <call method="setFileHandler">
+            <argument name="extension" type="scalar">
+                <property name="value" value="conf" />
+            </argument>
+            <argument name="fileHandler" type="dependency">
+                <property name="interface" value="zibo\core\build\handler\FileHandler" />
+                <property name="id" value="config.conf" />
             </argument>
         </call>
         <call method="setFileHandler">

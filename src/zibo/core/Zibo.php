@@ -2,8 +2,6 @@
 
 namespace zibo\core;
 
-use zibo\library\ObjectFactory;
-
 use zibo\core\environment\dependency\argument\CallArgumentParser;
 use zibo\core\environment\dependency\argument\ConfigArgumentParser;
 use zibo\core\environment\dependency\argument\DependencyArgumentParser;
@@ -22,6 +20,7 @@ use zibo\library\mvc\dispatcher\Dispatcher;
 use zibo\library\router\exception\RouterException;
 use zibo\library\router\Route;
 use zibo\library\router\Router;
+use zibo\library\ObjectFactory;
 
 use \Exception;
 
@@ -253,22 +252,21 @@ class Zibo {
      */
     public function __construct(Environment $environment) {
         $this->environment = $environment;
-        $this->eventManager = new EventManager();
-        $this->dependencyInjector = null;
-
-        $this->request = null;
-        $this->response = null;
-        $this->router = null;
-        $this->dispatcher = null;
 
         $this->setDependencyInjector();
 
         try {
             $this->log = $this->getDependency('zibo\\library\\log\\Log');
-            $this->eventManager->setLog($this->log);
         } catch (Exception $e) {
 
         }
+
+        $this->eventManager = $this->getDependency('zibo\\core\\event\\EventManager');
+
+        $this->request = null;
+        $this->response = null;
+        $this->router = null;
+        $this->dispatcher = null;
 
         $this->state = self::STATE_IDLE;
     }

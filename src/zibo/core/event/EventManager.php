@@ -1,6 +1,9 @@
 <?php
 
-namespace zibo\core;
+namespace zibo\core\event;
+
+use zibo\core\event\loader\EventLoader;
+use zibo\core\Zibo;
 
 use zibo\library\log\Log;
 use zibo\library\Callback;
@@ -38,6 +41,12 @@ class EventManager {
     private $defaultWeight;
 
     /**
+     * Lazy event loader
+     * @var zibo\core\event\loader\EventLoader
+     */
+    private $loader;
+
+    /**
      * Instance of the Log
      * @var zibo\library\log\Log
      */
@@ -49,10 +58,24 @@ class EventManager {
      * each event
      * @return null
      */
-    function __construct($maxEventListeners = self::DEFAULT_MAX_EVENT_LISTENERS) {
+    function __construct($maxEventListeners = null) {
+        if ($maxEventListeners === null) {
+            $maxEventListeners = self::DEFAULT_MAX_EVENT_LISTENERS;
+        }
+
         $this->setMaxEventListeners($maxEventListeners);
         $this->events = array();
+        $this->loader = null;
         $this->log = null;
+    }
+
+    /**
+     * Sets the event loader
+     * @param zibo\core\event\loader\EventLoader $loader
+     * @return null
+     */
+    public function setLoader(EventLoader $loader) {
+        $this->loader = $loader;
     }
 
     /**
@@ -257,10 +280,15 @@ class EventManager {
     protected function checkEvent($event) {
         $this->checkEventName($event);
 
+        if ($this->loader) {
+            $this->loader->loadEvents($event, $this);
+        }
+
         if (!isset($this->events[$event])) {
             if ($this->log) {
                 $this->log->logDebug('Event ' . $event, 'no listener registered', Zibo::LOG_SOURCE);
             }
+
             return false;
         }
 
