@@ -36,6 +36,8 @@ However, we encourage to define your listeners with a proper signature and in a 
 
 ## Register A Event Listener
 
+### Through Code
+
 You can register a event listener to Zibo using the call:
 
     $zibo->registerEventListener('event.name', array($instance, 'method'));
@@ -66,7 +68,27 @@ In the following example, _$foo->methodC()_ would be triggered first, then _$foo
     $zibo->triggerEvent('event.name');
     
 Events are generally registered in a module class. 
-See the Modules page for more information.
+See the [Modules](/manual/core/Modules) page for more information.
+
+### Through Configuration
+
+You can create a _config/events.conf_ file to define your event listeners.
+The file has a cron like syntax: it defines the eventname, the callback and optionally the weight.
+
+    # eventname         callback        weight
+    ; minimum definition
+    core.response.pre   vendor\MyClass->method
+    ; definition with weight
+    core.response.pre   vendor\MyClass->method      75
+    ; static method
+    core.response.pre   vendor\MyClass::method      75
+    ; dynamic event listener
+    core.response.pre   %param.class%->%param.method%      %param.weight%                  
+    
+The class, method and weight are loaded from the Zibo parameters if they are delimited by _%_.
+The callback class instance is created by the dependency injector.
+
+Lines which start with a hash (#) or semicolon (;) are considered comments.
 
 ## Builtin Events
 
