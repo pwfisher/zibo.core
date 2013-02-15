@@ -2,7 +2,6 @@
 
 namespace zibo\core\event\loader\io;
 
-use zibo\core\environment\filebrowser\FileBrowser;
 use zibo\core\event\loader\Event;
 use zibo\core\Zibo;
 
@@ -22,18 +21,18 @@ class ConfigEventIO implements EventIO {
     const FILE_NAME = 'events.conf';
 
     /**
-     * Instance of the file browser
-     * @var zibo\core\environment\filebrowser\FileBrowser
+     * Instance of Zibo
+     * @var zibo\core\Zibo
      */
-    private $fileBrowser;
+    private $zibo;
 
     /**
      * Constructs a new event I/O
-     * @param zibo\core\environment\filebrowser\FileBrowser $fileBrowser
+     * @param zibo\core\Zibo $zibo
      * @return null
      */
-    public function __construct(FileBrowser $fileBrowser) {
-        $this->fileBrowser = $fileBrowser;
+    public function __construct(Zibo $zibo) {
+        $this->zibo = $zibo;
     }
 
     /**
@@ -46,7 +45,7 @@ class ConfigEventIO implements EventIO {
 
         $file = Zibo::DIRECTORY_CONFIG . File::DIRECTORY_SEPARATOR . self::FILE_NAME;
 
-        $files = array_reverse($this->fileBrowser->getFiles($file));
+        $files = array_reverse($this->zibo->getFiles($file));
         foreach ($files as $file) {
             $fileEvents = $this->readEventsFromFile($file);
             foreach ($fileEvents as $fileEvent) {
@@ -108,10 +107,75 @@ class ConfigEventIO implements EventIO {
                 $weight = trim(substr($line, $positionSpace));
             }
 
+            $callback = $this->processCallback($callback);
+            $weight = $this->processParameter($weight);
+
             $events[] = new Event($event, $callback, $weight);
         }
 
         return $events;
+    }
+
+    /**
+     * Processes the parameters in the callback string
+     * @param string $callback Callback string
+     * @return string Provided callback with the parameters resolved
+     */
+    protected function processCallback($callback) {
+        $callback = $this->processParameter($callback);
+
+        if (strpos($callback, '->') !== false) {
+            list($class, $method) = explode('->', $callback, 2);
+            if (strpos($class, '#') === false) {
+                $id = null;
+            } else {
+                list($class, $id) = explode('#', $class, 2);
+            }
+
+            $class = $this->processParameter($class);
+            $id = $this->processParameter($id);
+            $method = $this->processParameter($method);
+
+            $callback = $class;
+            if ($id) {
+                $callback .= '#' . $id;
+            }
+            $callback .= '->' . $method;
+        } elseif (strpos($callback, '::') !== false) {
+            list($class, $method) = explode('::', $callback, 2);
+
+            $class = $this->processParameter($class);
+            $method = $this->processParameter($method);
+
+            $callback = $class . '::' . $method;
+        } else {
+            $callback = $this->processParameter($callback);
+        }
+
+        return $callback;
+    }
+
+    /**
+     * Gets a parameter value if applicable (delimited by %)
+     * @param string $parameter Parameter string
+     * @return string Provided parameter if not a parameter string, the
+     * parameter value otherwise
+     */
+    protected function processParameter($parameter) {
+        if (substr($parameter, 0, 1) != '%' && substr($parameter, -1) != '%') {
+            return $parameter;
+        }
+
+        $parameter = substr($parameter, 1, -1);
+
+        if (strpos($parameter, '|') !== false) {
+            list($key, $default) = explode('|', $parameter, 2);
+        } else {
+            $key = $parameter;
+            $default = null;
+        }
+
+        return $this->zibo->getParameter($key, $default);
     }
 
 }

@@ -414,6 +414,7 @@ class Zibo {
 
         $this->dependencyInjector->setInstance($objectFactory);
         $this->dependencyInjector->setInstance($this);
+        $this->dependencyInjector->setInstance($this->dependencyInjector);
         $this->dependencyInjector->setInstance($this->environment);
         $this->dependencyInjector->setInstance($this->environment->getConfig());
         $this->dependencyInjector->setInstance($this->environment->getFileBrowser(), 'zibo\\core\\environment\\filebrowser\\FileBrowser');

@@ -143,11 +143,13 @@ class CachedRouteContainerIO implements RouteContainerIO {
             $arguments = $route->getPredefinedArguments();
             if ($arguments) {
                 $argumentIndex = 1;
-                $argumentsArray = array();
 
-                foreach ($arguments as $argument) {
+                $predefinedArguments = 'array(';
+
+                foreach ($arguments as $name => $argument) {
                     if (is_scalar($argument)) {
-                        $argumentsArray[] = var_export($argument, true);
+                        $predefinedArguments .= var_export($name, true) . ' => ' . var_export($argument, true) . ', ';
+
                         continue;
                     }
 
@@ -160,16 +162,12 @@ class CachedRouteContainerIO implements RouteContainerIO {
                     $output .= var_export($argument->getType(), true) . ', ';
                     $output .= var_export($argument->getProperties(), true) . ");\n";
 
-                    $output .= '// hmm' . "\n";
-
-                    $argumentsArray[] = '$a' . $argumentIndex;
+                    $predefinedArguments .= var_export($name, true) . ' => $a' . $argumentIndex . ', ';
 
                     $argumentIndex++;
                 }
 
-                $output .= '$route->setPredefinedArguments(array(';
-                $output .= implode(', ', $argumentsArray);
-                $output .= '));' . "\n";
+                $output .= '$route->setPredefinedArguments(' . $predefinedArguments . "));\n";
             }
 
             $locale = $route->getLocale();

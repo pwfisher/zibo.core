@@ -2,6 +2,8 @@
 
 namespace zibo\core\event\loader;
 
+use zibo\library\dependency\DependencyInjector;
+
 use zibo\core\event\loader\io\EventIO;
 use zibo\core\event\EventManager;
 use zibo\core\Zibo;
@@ -40,9 +42,9 @@ class GenericEventLoader implements EventLoader {
      * @param zibo\core\event\loader\io\EventIO $io
      * @return null
      */
-    public function __construct(EventIO $io, Zibo $zibo) {
+    public function __construct(EventIO $io, DependencyInjector $dependencyInjector) {
         $this->io = $io;
-        $this->zibo = $zibo;
+        $this->dependencyInjector = $dependencyInjector;
         $this->events = false;
         $this->registered = array();
     }
@@ -77,7 +79,7 @@ class GenericEventLoader implements EventLoader {
     protected function registerEvents($event, EventManager $eventManager) {
         foreach ($this->events[$event] as $e) {
             $callback = $this->processCallback($e->getCallback());
-            $weight = $this->processParameter($e->getWeight());
+            $weight = $e->getWeight();
             if ($weight) {
                 $weight = (integer) $weight;
             }
@@ -92,8 +94,6 @@ class GenericEventLoader implements EventLoader {
      * @return array|string
      */
     protected function processCallback($callback) {
-        $callback = $this->processParameter($callback);
-
         if (strpos($callback, '->') !== false) {
             // instance method
             list($class, $method) = explode('->', $callback, 2);
@@ -103,48 +103,16 @@ class GenericEventLoader implements EventLoader {
                 list($class, $id) = explode('#', $class, 2);
             }
 
-            $class = $this->processParameter($class);
-            $id = $this->processParameter($id);
-            $method = $this->processParameter($method);
-
-            $instance = $this->zibo->getDependency($class, $id);
+            $instance = $this->dependencyInjector->get($class, $id);
 
             return array($instance, $method);
         } elseif (strpos($callback, '::') !== false) {
             // static method
-            list($class, $method) = explode('::', $callback, 2);
-
-            $class = $this->processParameter($class);
-            $method = $this->processParameter($method);
-
-            return array($instance, $method);
+            return explode('::', $callback, 2);
         } else {
             // function
             return $callback;
         }
-    }
-
-    /**
-     * Gets a parameter value if applicable (delimited by %)
-     * @param string $parameter Parameter string
-     * @return string Provided parameter if not a parameter string, the
-     * parameter value otherwise
-     */
-    protected function processParameter($parameter) {
-        if (substr($parameter, 0, 1) != '%' && substr($parameter, -1) != '%') {
-            return $parameter;
-        }
-
-        $parameter = substr($parameter, 1, -1);
-
-        if (strpos($parameter, '|') !== false) {
-            list($key, $default) = explode('|', $parameter, 2);
-        } else {
-            $key = $parameter;
-            $default = null;
-        }
-
-        return $this->zibo->getParameter($key, $default);
     }
 
 }
