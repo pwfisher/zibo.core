@@ -2,7 +2,10 @@
 
 namespace zibo\core\console;
 
+use zibo\core\console\command\CacheCommand;
 use zibo\core\console\command\CacheClearCommand;
+use zibo\core\console\command\CacheDisableCommand;
+use zibo\core\console\command\CacheEnableCommand;
 use zibo\core\console\command\DependencySearchCommand;
 use zibo\core\console\command\DeployCommand;
 use zibo\core\console\command\FileSearchCommand;
@@ -173,7 +176,10 @@ class Console {
      */
     public function initialize(Zibo $zibo) {
         $this->interpreter = new CommandInterpreter($zibo);
+        $this->interpreter->registerCommand(new CacheCommand());
         $this->interpreter->registerCommand(new CacheClearCommand());
+        $this->interpreter->registerCommand(new CacheDisableCommand());
+        $this->interpreter->registerCommand(new CacheEnableCommand());
         $this->interpreter->registerCommand(new DependencySearchCommand());
         $this->interpreter->registerCommand(new DeployCommand());
         $this->interpreter->registerCommand(new ExitCommand());
