@@ -36,16 +36,17 @@ abstract class FileSystem {
             case 'LINUX':
             case 'UNIX':
             case 'DARWIN':
-                require_once __DIR__ . DIRECTORY_SEPARATOR . 'UnixFileSystem.php';
                 self::$instance = new UnixFileSystem();
+
                 break;
             case 'WIN32':
             case 'WINNT':
-                require_once __DIR__ . DIRECTORY_SEPARATOR . 'WindowsFileSystem.php';
                 self::$instance = new WindowsFileSystem();
+
                 break;
             default:
                 throw new FileSystemException('File system of ' . $osType . ' is not supported by Zibo');
+
                 break;
         }
 

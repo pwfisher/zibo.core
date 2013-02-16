@@ -44,10 +44,18 @@ class ParameterCacheControl implements CacheControl {
     }
 
     /**
-    * Gets whether this cache is enabled
-    * @param zibo\core\Zibo $zibo Instance of Zibo
-    * @return boolean
-    */
+     * Gets whether this cache can be toggled
+     * @return boolean
+     */
+    public function canToggle() {
+        return true;
+    }
+
+    /**
+     * Gets whether this cache is enabled
+     * @param zibo\core\Zibo $zibo Instance of Zibo
+     * @return boolean
+     */
     public function isEnabled(Zibo $zibo) {
         $this->config->read(new File(ZIBO_CONFIG));
 

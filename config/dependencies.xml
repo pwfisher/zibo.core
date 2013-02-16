@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <container>
+    <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\ClassesCacheControl" id="classes" />
+    
     <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\DependencyCacheControl" id="dependencies" />
     
-    <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\FileSystemCacheControl" id="filesystem" />
+    <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\EventsCacheControl" id="events" />
     
     <dependency interface="zibo\core\cache\control\CacheControl" class="zibo\core\cache\control\ParameterCacheControl" id="parameters" />
     
@@ -112,8 +114,8 @@
     </dependency>
 
     <dependency class="zibo\core\event\EventManager" id="core">
-        <call method="setLoader">
-            <argument name="loader" type="dependency">
+        <call method="setEventLoader">
+            <argument name="eventLoader" type="dependency">
                 <property name="interface" value="zibo\core\event\loader\EventLoader" />
             </argument>
         </call>

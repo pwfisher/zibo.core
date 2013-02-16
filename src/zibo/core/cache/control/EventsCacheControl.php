@@ -2,21 +2,19 @@
 
 namespace zibo\core\cache\control;
 
-use zibo\core\router\CachedRouteContainerIO;
+use zibo\core\event\loader\io\CachedEventIO;
 use zibo\core\Zibo;
 
-use zibo\library\filesystem\File;
-
 /**
- * Cache control implementation for the image cache
+ * Cache control implementation for the events
  */
-class RouteCacheControl implements CacheControl {
+class EventsCacheControl implements CacheControl {
 
     /**
      * Name of this control
      * @var string
      */
-    const NAME = 'route';
+    const NAME = 'events';
 
     /**
      * Gets the name of this cache
@@ -40,9 +38,9 @@ class RouteCacheControl implements CacheControl {
      * @return boolean
      */
     public function isEnabled(Zibo $zibo) {
-        $io = $zibo->getDependency('zibo\\core\\router\\RouteContainerIO');
+        $io = $zibo->getDependency('zibo\\core\\event\\loader\\io\\EventIO');
 
-        return $io instanceof CachedRouteContainerIO;
+        return $io instanceof CachedEventIO;
     }
 
     /**
@@ -69,12 +67,12 @@ class RouteCacheControl implements CacheControl {
 	 * @return null
      */
     public function clear(Zibo $zibo) {
-        $io = $zibo->getDependency('zibo\\core\\router\\RouteContainerIO');
-        if (!$io instanceof CachedRouteContainerIO) {
+        $io = $zibo->getDependency('zibo\\core\\event\\loader\\io\\EventIO');
+        if (!$io instanceof CachedEventIO) {
             return;
         }
 
-        $file  = $io->getFile();
+        $file = $io->getFile();
         if ($file->exists()) {
             $file->delete();
         }

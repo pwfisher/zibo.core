@@ -136,8 +136,8 @@ class Builder {
         $config->setPublicDirectory($this->public);
         $config->removeModulesDirectories();
         $config->setEnvironment($environment);
+        $config->setWillCacheClasses(true);
         $config->setWillCacheDependencies(true);
-        $config->setWillCacheFileSystem(false);
         $config->setWillCacheParameters(true);
         $config->write($newConfigFile);
 

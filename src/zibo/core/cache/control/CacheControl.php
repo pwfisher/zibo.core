@@ -16,6 +16,12 @@ interface CacheControl {
     public function getName();
 
     /**
+     * Gets whether this cache can be toggled
+     * @return boolean
+     */
+    public function canToggle();
+
+    /**
      * Gets whether this cache is enabled
 	 * @param zibo\core\Zibo $zibo Instance of Zibo
      * @return boolean

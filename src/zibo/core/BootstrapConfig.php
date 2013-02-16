@@ -54,16 +54,16 @@ class BootstrapConfig {
     private $environment;
 
     /**
+     * Flag to see if the common classes should be cached
+     * @var boolean
+     */
+    private $cacheClasses;
+
+    /**
      * Flag to see if the dependencies should be cached
      * @var boolean
      */
     private $cacheDependencies;
-
-    /**
-     * Flag to see if the file system should be cached
-     * @var boolean
-     */
-    private $cacheFileSystem;
 
     /**
      * Flag to see if the parameters should be cached
@@ -82,8 +82,8 @@ class BootstrapConfig {
         $this->directoryApplication = null;
         $this->directoriesModules = array();
         $this->environment = 'dev';
+        $this->cacheClasses = false;
         $this->cacheDependencies = false;
-        $this->cacheFileSystem = false;
         $this->cacheParameters = false;
     }
 
@@ -216,20 +216,20 @@ class BootstrapConfig {
     }
 
     /**
-     * Sets whether the file system will be cached
+     * Sets whether the common classes will be cached
      * @param boolean $flag
      * @return null
      */
-    public function setWillCacheFileSystem($flag) {
-        $this->cacheFileSystem = $flag;
+    public function setWillCacheClasses($flag) {
+        $this->cacheClasses = $flag;
     }
 
     /**
-     * Gets whether the file system will be cached
+     * Gets whether the common classes will be cached
      * @return string
      */
-    public function willCacheFileSystem() {
-        return $this->cacheFileSystem;
+    public function willCacheClasses() {
+        return $this->cacheClasses;
     }
 
     /**
@@ -299,10 +299,10 @@ class BootstrapConfig {
             $this->cacheDependencies = false;
         }
 
-        if (isset($config['cache']['filesystem'])) {
-            $this->cacheFileSystem = $config['cache']['filesystem'];
+        if (isset($config['cache']['classes'])) {
+            $this->cacheClasses = $config['cache']['classes'];
         } else {
-            $this->cacheParameters = false;
+            $this->cacheClasses = false;
         }
 
         if (isset($config['cache']['parameters'])) {
@@ -322,8 +322,8 @@ class BootstrapConfig {
             'environment' => $this->environment,
             'dir' => array(),
             'cache' => array(
+                'classes' => $this->cacheClasses,
                 'dependencies' => $this->cacheDependencies,
-                'filesystem' => $this->cacheFileSystem,
                 'parameters' => $this->cacheParameters,
             ),
         );

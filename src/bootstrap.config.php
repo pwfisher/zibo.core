@@ -19,10 +19,10 @@ $config = array(
         'modules' => null,
     ),
     'cache' => array(
+        // flag to cache the common classes (bool)
+        'classes' => false,
         // flag to cache the dependencies (bool)
         'dependencies' => false,
-        // flag to cache the filesystem (bool)
-        'filesystem' => false,
         // flag to cache the parameters (bool)
         'parameters' => false,
     ),

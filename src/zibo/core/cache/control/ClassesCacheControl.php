@@ -3,21 +3,21 @@
 namespace zibo\core\cache\control;
 
 use zibo\core\BootstrapConfig;
-use zibo\core\environment\filebrowser\IndexedFileBrowser;
+use zibo\core\Bootstrap;
 use zibo\core\Zibo;
 
 use zibo\library\filesystem\File;
 
 /**
- * Cache control implementation for the indexed file browser
+ * Cache control implementation for the common classes
  */
-class FileSystemCacheControl implements CacheControl {
+class ClassesCacheControl implements CacheControl {
 
     /**
      * Name of this control
      * @var string
      */
-    const NAME = 'filesystem';
+    const NAME = 'classes';
 
     /**
      * Instance of Zibo bootstrap configuration
@@ -43,6 +43,14 @@ class FileSystemCacheControl implements CacheControl {
     }
 
     /**
+     * Gets whether this cache can be toggled
+     * @return boolean
+     */
+    public function canToggle() {
+        return true;
+    }
+
+    /**
     * Gets whether this cache is enabled
     * @param zibo\core\Zibo $zibo Instance of Zibo
     * @return boolean
@@ -50,7 +58,7 @@ class FileSystemCacheControl implements CacheControl {
     public function isEnabled(Zibo $zibo) {
         $this->config->read(new File(ZIBO_CONFIG));
 
-        return $this->config->willCacheFileSystem();
+        return $this->config->willCacheClasses();
     }
 
     /**
@@ -60,11 +68,11 @@ class FileSystemCacheControl implements CacheControl {
      */
     public function enable(Zibo $zibo) {
         $this->config->read(new File(ZIBO_CONFIG));
-        if ($this->config->willCacheFileSystem()) {
+        if ($this->config->willCacheClasses()) {
             return;
         }
 
-        $this->config->setWillCacheFileSystem(true);
+        $this->config->setWillCacheClasses(true);
         $this->config->write(new File(ZIBO_CONFIG));
     }
 
@@ -75,11 +83,11 @@ class FileSystemCacheControl implements CacheControl {
      */
     public function disable(Zibo $zibo) {
         $this->config->read(new File(ZIBO_CONFIG));
-        if (!$this->config->willCacheFileSystem()) {
+        if (!$this->config->willCacheClasses()) {
             return;
         }
 
-        $this->config->setWillCacheFileSystem(false);
+        $this->config->setWillCacheClasses(false);
         $this->config->write(new File(ZIBO_CONFIG));
     }
 
@@ -89,12 +97,10 @@ class FileSystemCacheControl implements CacheControl {
 	 * @return null
      */
     public function clear(Zibo $zibo) {
-        $fileBrowser = $zibo->getEnvironment()->getFileBrowser();
-        if (!$fileBrowser instanceof IndexedFileBrowser) {
-            return;
+        $file = new File($zibo->getApplicationDirectory() . Bootstrap::FILE_CLASSES_CACHE);
+        if ($file->exists()) {
+            $file->delete();
         }
-
-        $fileBrowser->reset();
     }
 
 }

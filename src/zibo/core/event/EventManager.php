@@ -26,31 +26,31 @@ class EventManager {
      * event listeners as value.
      * @var array
      */
-    private $events;
+    protected $events;
 
     /**
      * Maximum number of event listeners for each event
      * @var int
      */
-    private $maxEventListeners;
+    protected $maxEventListeners;
 
     /**
      * Default weight for a new event
      * @var int
      */
-    private $defaultWeight;
+    protected $defaultWeight;
 
     /**
      * Lazy event loader
      * @var zibo\core\event\loader\EventLoader
      */
-    private $loader;
+    protected $loader;
 
     /**
      * Instance of the Log
      * @var zibo\library\log\Log
      */
-    private $log;
+    protected $log;
 
     /**
      * Constructs a new event manager
@@ -58,7 +58,7 @@ class EventManager {
      * each event
      * @return null
      */
-    function __construct($maxEventListeners = null) {
+    public function __construct($maxEventListeners = null) {
         if ($maxEventListeners === null) {
             $maxEventListeners = self::DEFAULT_MAX_EVENT_LISTENERS;
         }
@@ -74,8 +74,16 @@ class EventManager {
      * @param zibo\core\event\loader\EventLoader $loader
      * @return null
      */
-    public function setLoader(EventLoader $loader) {
-        $this->loader = $loader;
+    public function setEventLoader(EventLoader $eventLoader) {
+        $this->loader = $eventLoader;
+    }
+
+    /**
+     * Gets the event loader
+     * @return \zibo\core\event\loader\EventLoader
+     */
+    public function getEventLoader() {
+        return $this->loader;
     }
 
     /**
@@ -93,7 +101,7 @@ class EventManager {
      * @throws Exception when the provided maxEventListeners is not
      * a positive number
      */
-    private function setMaxEventListeners($maxEventListeners) {
+    protected function setMaxEventListeners($maxEventListeners) {
         if (!is_integer($maxEventListeners) || $maxEventListeners <= 0) {
             throw new Exception('Provided maximum of events is zero or negative');
         }
@@ -237,7 +245,7 @@ class EventManager {
      * @param array $arguments Array with the arguments for the event listeners
      * @return null
      */
-    private function invokeEventListeners($event, array $arguments) {
+    protected function invokeEventListeners($event, array $arguments) {
         if ($this->log) {
             $argumentsString = '';
 

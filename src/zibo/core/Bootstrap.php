@@ -2,10 +2,10 @@
 
 namespace zibo\core;
 
+use zibo\core\cache\classes\ClassMinifier;
 use zibo\core\environment\config\ZiboIniConfigIO;
 use zibo\core\environment\dependency\io\ZiboXmlDependencyIO;
 use zibo\core\environment\filebrowser\FileBrowser;
-use zibo\core\environment\filebrowser\IndexedFileBrowser;
 use zibo\core\environment\filebrowser\ZiboFileBrowser;
 use zibo\core\environment\Autoloader as ZiboAutoloader;
 use zibo\core\environment\Environment;
@@ -25,6 +25,18 @@ use \Exception;
 class Bootstrap {
 
     /**
+     * Path to the config of the classes cache
+     * @var string
+     */
+    const FILE_CLASSES_CONFIG = 'config/classes.conf';
+
+    /**
+     * Path to the classes cache file
+     * @var string
+     */
+    const FILE_CLASSES_CACHE = '/data/cache/classes.php';
+
+    /**
      * Constructs a new bootstrap
      * @param array $config Configuration values for the bootstrap
      *
@@ -39,8 +51,8 @@ class Bootstrap {
      *         'modules' => null, // path(s) to the module container directories (null|string|array)
      *     ),
      *     'cache' => array(
+     *         'classes' => false, // flag to cache the common classes (bool)
      *         'dependencies' => false, // flag to cache the dependencies (bool)
-     *         'filesystem' => false, // flag to cache the filesystem (bool)
      *         'parameters' => false, // flag to cache the parameters (bool)
  	 *     ),
  	 *     'sapi' => null // full class name of the sapi (string)
@@ -56,7 +68,7 @@ class Bootstrap {
         $this->applicationDirectory = null;
         $this->modulesDirectories = null;
         $this->willCacheDependencies = false;
-        $this->willCacheFileSystem = false;
+        $this->willCacheClasses = false;
         $this->willCacheParameters = false;
         $this->sapi = null;
         $this->fileBrowser = null;
@@ -85,8 +97,8 @@ class Bootstrap {
             $this->willCacheDependencies = $config['cache']['dependencies'];
         }
 
-        if (isset($config['cache']['filesystem'])) {
-            $this->willCacheFileSystem = $config['cache']['filesystem'];
+        if (isset($config['cache']['classes'])) {
+            $this->willCacheClasses = $config['cache']['classes'];
         }
 
         if (isset($config['cache']['parameters'])) {
@@ -131,18 +143,30 @@ class Bootstrap {
      * @return Zibo
      */
     public function boot() {
-        // include the error handler and the autoloader
-        $this->loadClass('zibo\\library\\ErrorHandler');
-        $this->loadClass('zibo\\library\\Autoloader');
+        $classesFile = $this->applicationDirectory . self::FILE_CLASSES_CACHE;
+        if (file_exists($classesFile)) {
+            // load common classes at once
+            require_once $classesFile;
+
+            $loadTmpAutoloader = false;
+        } else {
+            // load every class individually
+            $this->loadClass('zibo\\library\\ErrorHandler');
+            $this->loadClass('zibo\\library\\Autoloader');
+
+            $loadTmpAutoloader = true;
+        }
 
         // register the error handler to convert errors into exceptions
         $errorHandler = new ErrorHandler();
         $errorHandler->registerErrorHandler();
 
-        // register a basic autoloader and add the src of system to it
-        $autoloader = new Autoloader();
-        $autoloader->addIncludePath($this->coreDirectory . '/src');
-        $autoloader->registerAutoLoader();
+        if ($loadTmpAutoloader) {
+            // register a temporary autoloader and add the src of system to it
+            $autoloader = new Autoloader();
+            $autoloader->addIncludePath($this->coreDirectory . '/src');
+            $autoloader->registerAutoLoader();
+        }
 
         // create the file browser
         $this->loadClass('zibo\\library\\filesystem\\exception\\FileSystemException');
@@ -152,8 +176,15 @@ class Bootstrap {
         $ziboAutoloader = new ZiboAutoloader($fileBrowser);
         $ziboAutoloader->registerAutoloader();
 
-        // unregister the basic autoloader
-        $autoloader->unregisterAutoloader();
+        // unregister the temporary autoloader
+        if ($loadTmpAutoloader) {
+            $autoloader->unregisterAutoloader();
+        }
+
+        // write the classes cache if needed
+        if ($this->willCacheClasses && $loadTmpAutoloader) {
+            $this->writeClassesCache($fileBrowser);
+        }
 
         // create the environment
         $parametersIO = $this->createParametersIO($fileBrowser);
@@ -187,11 +218,6 @@ class Bootstrap {
             } else {
                 $fileBrowser->addModulesDirectory($this->modulesDirectories);
             }
-        }
-
-        if ($this->willCacheFileSystem) {
-            $indexFile = new File($this->applicationDirectory, Zibo::DIRECTORY_DATA . '/' . Zibo::DIRECTORY_CACHE . '/filesystem.php');
-            $fileBrowser = new IndexedFileBrowser($indexFile, $fileBrowser);
         }
 
         return $fileBrowser;
@@ -243,6 +269,49 @@ class Bootstrap {
         }
 
         return new $this->sapi;
+    }
+
+    /**
+     * Writes the classes cache
+     * @param zibo\core\environment\filebrowser\FileBrowser $fileBrowser
+     * @return null
+     */
+    protected function writeClassesCache(FileBrowser $fileBrowser) {
+        $classes = $this->readClasses($fileBrowser);
+
+        $minifier = new ClassMinifier();
+        $source = $minifier->minify($classes);
+
+        $file = new File($this->applicationDirectory . self::FILE_CLASSES_CACHE);
+        $file->getParent()->create();
+        $file->write($source);
+    }
+
+    /**
+     * Read the classes from config/classes.conf
+     * @param zibo\core\environment\filebrowser\FileBrowser $fileBrowser
+     * @return array
+     */
+    protected function readClasses(FileBrowser $fileBrowser) {
+        $classes = array();
+
+        $files = array_reverse($fileBrowser->getFiles(self::FILE_CLASSES_CONFIG));
+        foreach ($files as $file) {
+            $content = $file->read();
+
+            $lines = explode("\n", $content);
+            foreach ($lines as $line) {
+                $line = trim($line);
+
+                if (!$line || substr($line, 0, 1) == '#' || substr($line, 0, 1) == ';') {
+                    continue;
+                }
+
+                $classes[$line] = true;
+            }
+        }
+
+        return array_keys($classes);
     }
 
     /**
