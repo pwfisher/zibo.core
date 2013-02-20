@@ -321,6 +321,10 @@ class Bootstrap {
      * @throws Exception when the class does not exist
      */
     protected function loadClass($className) {
+        if (class_exists($className) || interface_exists($className)) {
+            return;
+        }
+
         $file = $this->coreDirectory . '/src/' . str_replace('\\', '/', $className) . '.php';
         if (!file_exists($file)) {
             throw new Exception('Could not load class ' . $className . ': ' . $file . ' does not exist');
