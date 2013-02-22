@@ -203,6 +203,10 @@ class EventManager {
     public function hasEventListeners($event) {
         $this->checkEventName($event);
 
+        if ($this->loader) {
+            $this->loader->loadEvents($event, $this);
+        }
+
         return isset($this->events[$event]);
     }
 
@@ -286,13 +290,7 @@ class EventManager {
      * @throws Exception when the provided event name is empty or invalid
      */
     protected function checkEvent($event) {
-        $this->checkEventName($event);
-
-        if ($this->loader) {
-            $this->loader->loadEvents($event, $this);
-        }
-
-        if (!isset($this->events[$event])) {
+        if (!$this->hasEventListeners($event)) {
             if ($this->log) {
                 $this->log->logDebug('Event ' . $event, 'no listener registered', Zibo::LOG_SOURCE);
             }
