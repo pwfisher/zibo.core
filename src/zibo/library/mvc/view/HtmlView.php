@@ -24,6 +24,19 @@ interface HtmlView extends View {
     public function getMeta($name = null);
 
     /**
+     * Adds a custom code block before the javascript
+     * @param string $code The custom code to add
+     * @return null
+     */
+    public function addPreJavascript($code);
+
+    /**
+     * Gets all the pre javascript blocks
+     * @return array Array with custom code blocks
+     */
+    public function getPreJavascripts();
+
+    /**
      * Adds a inline javascript to this view
      * @param string $script The javascript code to add
      * @return null
