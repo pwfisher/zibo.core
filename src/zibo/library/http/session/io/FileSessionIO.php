@@ -49,15 +49,16 @@ class FileSessionIO implements SessionIO {
 
     /**
      * Cleans up the sessions which are invalidated
+     * @param boolean $force Set to true to clear all sessions
      * @return null
      */
-    public function clean() {
+    public function clean($force = false) {
         $expires = time() - $this->timeout;
 
         $directory = new File($this->path);
         $sessions = $directory->read();
         foreach ($sessions as $session) {
-            if ($session->getModificationTime() > $expires) {
+            if (!$force && $session->getModificationTime() > $expires) {
                 continue;
             }
 

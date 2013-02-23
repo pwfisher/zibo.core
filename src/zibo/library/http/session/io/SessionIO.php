@@ -9,9 +9,10 @@ interface SessionIO {
 
     /**
      * Cleans up the sessions which are invalidated
+     * @param boolean $force Set to true to clear all sessions
      * @return null
      */
-    public function clean();
+    public function clean($force = false);
 
     /**
      * Reads the session data for the provided id

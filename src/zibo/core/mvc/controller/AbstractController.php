@@ -11,6 +11,7 @@ use zibo\library\http\Header;
 use zibo\library\mvc\controller\AbstractController as MvcAbstractController;
 use zibo\library\mvc\exception\MvcException;
 use zibo\library\mvc\Request;
+use zibo\library\mvc\view\JsonView;
 
 /**
  * Abstract implementation of a controller
@@ -85,6 +86,16 @@ abstract class AbstractController extends MvcAbstractController implements ZiboC
     }
 
     /**
+     * Sets the provided data as a json view
+     * @param mixed $data
+     * @return null
+     */
+    protected function setJsonView($data) {
+        $this->response->setHeader(Header::HEADER_CONTENT_TYPE, 'application/json');
+        $this->response->setView(new JsonView($data));
+    }
+
+    /**
      * Sets a download view for the provided file to the response
      * @param zibo\library\filesystem\File $file File which needs to be offered
      * for download
@@ -103,7 +114,8 @@ abstract class AbstractController extends MvcAbstractController implements ZiboC
             $name = preg_replace('/\./', '%2e', $name, substr_count($name, '.') - 1);
         }
 
-        $mime = Mime::getMimeType($this->zibo, $file);
+        $mimeFile = new File($name);
+        $mime = Mime::getMimeType($this->zibo, $mimeFile);
 
         $view = new FileView($file);
 

@@ -60,6 +60,7 @@ class HelpCommand extends AbstractCommand {
     	$command = $this->interpreter->getCommand($command);
     	$description = $command->getDescription();
     	$arguments = $command->getArguments();
+    	$flags= $command->getFlags();
 
     	if ($description) {
 			$output->write('');
@@ -68,6 +69,9 @@ class HelpCommand extends AbstractCommand {
 
         $output->write('');
     	$output->write('Syntax: ' . $command->getSyntax());
+    	foreach ($flags as $flag => $description) {
+    	    $output->write('- [--' . $flag . '] ' . $description);
+    	}
 		foreach ($arguments as $argument) {
 			$output->write('- ' . $argument);
 		}

@@ -16,6 +16,7 @@ class SessionCleanUpCommand extends AbstractCommand {
      */
     public function __construct() {
         parent::__construct('session clean', 'Cleans up the invalidated sessions');
+        $this->addFlag('force', 'To clear all sessions');
     }
 
     /**
@@ -25,8 +26,10 @@ class SessionCleanUpCommand extends AbstractCommand {
      * @return null
      */
     public function execute(InputValue $input, Output $output) {
+        $force = $input->hasFlag('force');
+
     	$sessionIO = $this->zibo->getDependency('zibo\\library\\http\\session\\io\\SessionIO');
-    	$sessionIO->clean();
+    	$sessionIO->clean($force);
     }
 
 }

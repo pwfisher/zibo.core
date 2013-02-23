@@ -29,6 +29,12 @@ abstract class AbstractCommand implements Command {
 	private $arguments;
 
 	/**
+	 * The definitions of the flags
+	 * @var array
+	 */
+	private $flags;
+
+	/**
 	 * Instance of Zibo
 	 * @var zibo\core\Zibo
 	 */
@@ -45,6 +51,7 @@ abstract class AbstractCommand implements Command {
 		$this->setName($name);
 		$this->setDescription($description);
 		$this->arguments = array();
+		$this->flags = array();
 	}
 
 	/**
@@ -99,6 +106,11 @@ abstract class AbstractCommand implements Command {
 		$optionalArguments = 0;
 
 		$syntax = $this->name;
+
+		foreach ($this->flags as $flag => $description) {
+		    $syntax .= ' [--' . $flag . ']';
+		}
+
 		foreach ($this->arguments as $argument) {
 			if ($argument->isRequired()) {
 				$syntax .= ' <' . $argument->getName() . '>';
@@ -150,6 +162,25 @@ abstract class AbstractCommand implements Command {
 	 */
 	public function getArguments() {
 		return $this->arguments;
+	}
+
+	/**
+	 * Adds the definition of a flag for this command.
+	 * @param string name Name of the argument
+	 * @param string description Description of the argument
+	 * @return null
+	 */
+	public function addFlag($name, $description) {
+		$this->flags[$name] = $description;
+	}
+
+	/**
+	 * Gets the description of the flags
+	 * @return array Array with the name of the flag as key and the description
+	 * as value
+	 */
+	public function getFlags() {
+	    return $this->flags;
 	}
 
     /**
