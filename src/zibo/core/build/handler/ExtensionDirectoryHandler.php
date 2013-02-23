@@ -46,9 +46,10 @@ class ExtensionDirectoryHandler implements DirectoryHandler {
      * @param zibo\library\filesystem\File $source The source directory
      * @param zibo\library\filesystem\File $destination The destination
      * directory
+     * @param array $exclude Excluded file names as key of the array
      * @return null
      */
-    public function handleDirectory(File $source, File $destination) {
+    public function handleDirectory(File $source, File $destination, array $exclude) {
         $files = $source->read();
         foreach ($files as $file) {
             $name = $file->getName();
@@ -56,16 +57,16 @@ class ExtensionDirectoryHandler implements DirectoryHandler {
             $destinationFile = new File($destination, $name);
 
             if ($file->isDirectory()) {
-                $this->handleDirectory($sourceFile, $destinationFile);
+                $this->handleDirectory($sourceFile, $destinationFile, $exclude);
                 continue;
             }
 
             $extension = $file->getExtension();
 
             if (isset($this->extensionFileHandlers[$extension])) {
-                $this->extensionFileHandlers[$extension]->handleFile($sourceFile, $destinationFile);
+                $this->extensionFileHandlers[$extension]->handleFile($sourceFile, $destinationFile, $exclude);
             } else {
-                $this->defaultFileHandler->handleFile($sourceFile, $destinationFile);
+                $this->defaultFileHandler->handleFile($sourceFile, $destinationFile, $exclude);
             }
         }
     }

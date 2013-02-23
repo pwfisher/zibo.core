@@ -43,8 +43,12 @@ class Builder {
      */
     private $exclude = array(
         '.git' => true,
+        '.gitignore' => true,
         '.settings' => true,
-        'log' => true,
+        '.svn' => true,
+        'smarty/development' => true,
+        'smarty/documentation' => true,
+        'application/log' => true,
         'test' => true,
     );
 
@@ -90,12 +94,12 @@ class Builder {
                 } else {
                     $handler = $handlers[self::DEFAULT_HANDLER];
                 }
-                $handler->handleDirectory($module, $directoryDestination);
+                $handler->handleDirectory($module, $directoryDestination, $this->exclude);
             }
         }
 
         // copy the public directory
-        $handlers[self::DEFAULT_HANDLER]->handleDirectory($fileBrowser->getPublicDirectory(), $this->public);
+        $handlers[self::DEFAULT_HANDLER]->handleDirectory($fileBrowser->getPublicDirectory(), $this->public, $this->exclude);
 
         // clear cache
         $cacheDirectory = new File($this->application, Zibo::DIRECTORY_DATA . '/' . Zibo::DIRECTORY_CACHE);

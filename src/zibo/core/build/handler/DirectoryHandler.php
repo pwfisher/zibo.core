@@ -15,8 +15,9 @@ interface DirectoryHandler {
      * @param zibo\library\filesystem\File $source The source directory
      * @param zibo\library\filesystem\File $destination The destination
      * directory
+     * @param array $exclude Excluded file names as key of the array
      * @return null
      */
-    public function handleDirectory(File $source, File $destination);
+    public function handleDirectory(File $source, File $destination, array $exclude);
 
 }

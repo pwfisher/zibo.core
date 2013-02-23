@@ -14,9 +14,10 @@ class DefaultFileHandler implements FileHandler {
      * @param zibo\library\filesystem\File $source The source file
      * @param zibo\library\filesystem\File $destination The destination
      * file
+     * @param array $exclude Excluded file names as key of the array
      * @return null
      */
-    public function handleFile(File $source, File $destination) {
+    public function handleFile(File $source, File $destination, array $exclude) {
         $source->copy($destination);
     }
 
