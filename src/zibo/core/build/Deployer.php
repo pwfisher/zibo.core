@@ -249,7 +249,8 @@ class Deployer {
         $this->updateScript(new File($this->localApplication, 'console.php'), $this->remoteApplication. '/console.php', $config);
 
         // post deploy actions
-        $this->executeRemoteConsoleCommand('cache clear');
+        $this->executeRemoteCommand('rm -r ' . $this->remoteApplication . '/' . Zibo::DIRECTORY_DATA . '/' . Zibo::DIRECTORY_CACHE . '/*'); // hard cache clear, needed for classes.php
+        $this->executeRemoteConsoleCommand('cache clear'); // soft cache clear, for the public cache
 
         $zibo->triggerEvent(self::EVENT_POST_DEPLOY, $this);
 
