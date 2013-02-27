@@ -20,11 +20,11 @@ class DefaultDirectoryHandler implements DirectoryHandler {
     public function handleDirectory(File $source, File $destination, array $exclude) {
         $files = $source->read();
         foreach ($files as $file) {
-            echo $file;
+//             echo $file;
 
             foreach ($exclude as $pattern => $null) {
                 if (strpos($file->getAbsolutePath(), $pattern) !== false) {
-                    echo " - skip\n";
+//                     echo " - skip\n";
                     continue 2;
                 }
             }
@@ -32,10 +32,10 @@ class DefaultDirectoryHandler implements DirectoryHandler {
             $fileDestination = new File($destination, $file->getName());
 
             if ($file->isDirectory()) {
-                echo " - recursive\n";
+//                 echo " - recursive\n";
                 $this->handleDirectory($file, $fileDestination, $exclude);
             } else {
-                echo " - copy\n";
+//                 echo " - copy\n";
                 $file->copy($fileDestination);
             }
         }

@@ -21,14 +21,14 @@ class IniFileHandler implements FileHandler {
      */
     public function handleFile(File $source, File $destination, array $exclude) {
         if ($destination->exists()) {
-            $ini = parse_ini_file($destination->getPath(), false, INI_SCANNER_RAW);
+            $ini = $this->read($destination);
         }
 
         if (!isset($ini) || $ini === false) {
             $ini = array();
         }
 
-        $sourceIni = parse_ini_file($source->getPath(), false, INI_SCANNER_RAW);
+        $sourceIni = $this->read($source);
         if ($sourceIni === false) {
             throw new BuildException('Could not read ' . $source);
         }
@@ -38,6 +38,15 @@ class IniFileHandler implements FileHandler {
         }
 
         $this->write($destination, $ini);
+    }
+
+    /**
+     * Reads the ini file
+     * @param zibo\library\filesystem\File $file
+     * @return array Ini contents as array
+     */
+    protected function read(File $file) {
+        return parse_ini_file($file->getPath(), false, INI_SCANNER_RAW);
     }
 
     /**
@@ -57,7 +66,8 @@ class IniFileHandler implements FileHandler {
                 $value = '"' . $value . '"';
             }
 
-            $value = '"' . str_replace('"', '\\"', substr($value, 1, -1)) . '"';
+            $value = str_replace('"', '\\"', substr($value, 1, -1));
+            $value = '"' . str_replace('\\\\"', '\\"', $value) . '"';
 
             $output .= $key . ' = ' . $value . '' . "\n";
         }
