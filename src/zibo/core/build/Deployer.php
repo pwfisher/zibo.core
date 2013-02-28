@@ -332,7 +332,13 @@ class Deployer {
      * @return null
      */
     protected function syncFiles($source, $destination) {
-        $command = 'rsync -urltDp ';
+        // -v verbose: increase verbosity
+        // -u update: skip files which are newer on the receiver
+        // -r recursive: recurse into directories
+        // -l links: copy symlinks as symlinks
+        // -t times: preserve modification times
+        // -p perms: preserve permissions
+        $command = 'rsync -vurltp ';
         if ($this->sshKey) {
             $command .= '-e "ssh -i ' . $this->sshKey . '" ';
         }
@@ -348,9 +354,9 @@ class Deployer {
      * @return string
      */
     public function executeLocalCommand($command) {
-        echo $command . "\n";
+        echo 'Invoking command: ' . $command . "\n";
 
-        return shell_exec($command);
+        return passthru($command);
     }
 
     /**

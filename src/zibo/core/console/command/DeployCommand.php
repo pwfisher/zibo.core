@@ -2,6 +2,7 @@
 
 namespace zibo\core\console\command;
 
+use zibo\core\build\Builder;
 use zibo\core\build\Deployer;
 use zibo\core\console\output\Output;
 use zibo\core\console\InputValue;
@@ -41,6 +42,12 @@ class DeployCommand extends AbstractCommand {
     const PARAM_PUBLIC = 'path.public';
 
     /**
+     * Parameter name of the environment
+     * @var string
+     */
+    const PARAM_ENVIRONMENT = 'environment';
+
+    /**
      * Parameter name of the path to the SSH key
      * @var string
      */
@@ -53,7 +60,7 @@ class DeployCommand extends AbstractCommand {
     public function __construct() {
         parent::__construct('deploy', 'Deploys your current Zibo to a remote server.');
         $this->addArgument('profile', 'Name of the deploy profile');
-        $this->addArgument('environment', 'Name of the environment (default: current environment)', false);
+        $this->addFlag('force', 'Force deployment of a dev environment');
     }
 
     /**
@@ -64,15 +71,54 @@ class DeployCommand extends AbstractCommand {
     public function execute(InputValue $input, Output $output) {
         $destination = $input->getArgument('destination');
         $profile = $input->getArgument('profile');
-        $environment = $input->getArgument('environment');
 
-        $params = $this->zibo->getParameter(self::PARAM_DEPLOY . $profile);
-        if (!is_array($params)) {
-            throw new Exception('Could not deploy ' . $profile . ': no profile defined');
+        $environment = $this->zibo->getEnvironment()->getName();
+        if ($environment == 'dev') {
+            if (!$input->hasFlag('force')) {
+                $output->write('Are you sure you want to build and deploy your dev environment at once? Add the --force flag to your command to actually perform this task.');
+            } else {
+                $this->buildAndDeploy($profile, $output);
+            }
+        } else {
+            $params = $this->zibo->getParameter(self::PARAM_DEPLOY . $profile);
+            if (!is_array($params)) {
+                throw new Exception('Could not deploy ' . $profile . ': no profile defined');
+            }
+            $params = Config::flattenConfig($params);
+
+            $this->deploy($profile, $params, $output);
         }
+    }
 
-        $params = Config::flattenConfig($params);
+    /**
+     * Builds to a temporary directory and deploys from there
+     * @param string $profile Name of the deploy profile
+     * @param zibo\core\console\output\Output $output
+     * @return null
+     */
+    protected function buildAndDeploy($profile, Output $output) {
+        $file = File::getTemporaryFile('build');
+        $file->delete();
+        $file->create();
 
+        $builder = new Builder();
+        $builder->build($this->zibo, $file);
+
+        $phpBinary = $this->zibo->getParameter('system.binary.php', 'php');
+
+        passthru($phpBinary . ' ' . $file . '/application/console.php deploy ' . $profile);
+
+        $file->delete();
+
+        $output->write('Deleted ' . $file);
+    }
+
+    /**
+     * Perform deployment of this installation
+     * @param array $params
+     * @throws Exception
+     */
+    protected function deploy($profile, $params, Output $output) {
         if (isset($params[self::PARAM_SERVER])) {
             $server = $params[self::PARAM_SERVER];
             unset($params[self::PARAM_SERVER]);
@@ -95,6 +141,15 @@ class DeployCommand extends AbstractCommand {
         }
 
         $deployer = new Deployer($server, $application, $public);
+
+        if (isset($params[self::PARAM_ENVIRONMENT])) {
+            $environment = $params[self::PARAM_ENVIRONMENT];
+            unset($params[self::PARAM_ENVIRONMENT]);
+        } else {
+            $environment = 'prod';
+        }
+
+        $output->write('Deploying to environment ' . $environment . ' from profile ' . $profile);
 
         if (isset($params[self::PARAM_SSH_KEY])) {
             $deployer->setSshKey($params[self::PARAM_SSH_KEY]);

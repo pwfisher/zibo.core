@@ -2,7 +2,7 @@
 
 When your application is ready for production, you can use the _build_ command in the console.
 
-    php console.php build <destination> [<environment>]
+    php console.php build <destination>
 
 The _build_ command will take a destination directory as argument.
 Your installation will be copied into the provided destination directory.
@@ -25,7 +25,7 @@ _Note: the build command is only available in the dev environment._
 
 After your application is built, you can easily sync it to a remote server using the following command:
 
-    php console.php deploy <profile> [<environment>]
+    php console.php deploy <profile> [<environment>] [--force]
     
 _Note: This command uses the ssh and rsync programs and will therefor only work on POSIX systems._
 

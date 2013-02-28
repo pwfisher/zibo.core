@@ -65,6 +65,8 @@ class Builder {
     public function build(Zibo $zibo, File $destination, $environment = 'prod', $cleanUp = true) {
         $this->prepareDestination($destination, $cleanUp);
 
+        echo "Copying files...\n";
+
         $handlers = $zibo->getDependencies('zibo\\core\\build\\handler\\DirectoryHandler');
 
         $fileBrowser = $zibo->getEnvironment()->getFileBrowser();
@@ -101,6 +103,8 @@ class Builder {
         // copy the public directory
         $handlers[self::DEFAULT_HANDLER]->handleDirectory($fileBrowser->getPublicDirectory(), $this->public, $this->exclude);
 
+        echo "Clearing caches\n";
+
         // clear cache
         $cacheDirectory = new File($this->application, Zibo::DIRECTORY_DATA . '/' . Zibo::DIRECTORY_CACHE);
         if ($cacheDirectory->exists()) {
@@ -114,6 +118,8 @@ class Builder {
                 $file->delete();
             }
         }
+
+        echo "Configuring the scripts\n";
 
         // copy htaccess
         $htaccessFile = new File(__DIR__ . '/../../../../.htaccess');
@@ -168,7 +174,8 @@ class Builder {
                 throw new BuildException('Destination ' . $destination . ' is not a writable');
             }
 
-            if ($cleanUp) {
+            $files = $destination->read();
+            if ($cleanUp && $files) {
                 echo 'Cleaned ' . $destination . "\n";
 
                 $destination->delete();
