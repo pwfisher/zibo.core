@@ -80,7 +80,7 @@ class String {
             return '';
         }
 
-        if (!is_integer($length) || $length <= 0) {
+        if (!is_numeric($length) || $length <= 0) {
             throw new Exception('Provided length is not a positive integer');
         }
 
