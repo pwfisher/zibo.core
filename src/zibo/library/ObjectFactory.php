@@ -52,7 +52,7 @@ class ObjectFactory {
             }
         }
 
-        if (is_null($arguments)) {
+        if (is_null($arguments) || !$arguments) {
             $instance = $classReflection->newInstance();
         } else {
         	$instance = $classReflection->newInstanceArgs($arguments);
