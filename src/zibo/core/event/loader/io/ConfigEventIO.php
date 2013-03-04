@@ -43,9 +43,12 @@ class ConfigEventIO implements EventIO {
     public function readEvents() {
         $events = array();
 
-        $file = Zibo::DIRECTORY_CONFIG . File::DIRECTORY_SEPARATOR . self::FILE_NAME;
+        $environment = $this->zibo->getEnvironment()->getName();
 
-        $files = array_reverse($this->zibo->getFiles($file));
+        $file = Zibo::DIRECTORY_CONFIG . File::DIRECTORY_SEPARATOR . self::FILE_NAME;
+        $environmentFile = Zibo::DIRECTORY_CONFIG . File::DIRECTORY_SEPARATOR . $environment . File::DIRECTORY_SEPARATOR . self::FILE_NAME;
+
+        $files = array_reverse($this->zibo->getFiles($file)) + array_reverse($this->zibo->getFiles($environmentFile));
         foreach ($files as $file) {
             $fileEvents = $this->readEventsFromFile($file);
             foreach ($fileEvents as $fileEvent) {
