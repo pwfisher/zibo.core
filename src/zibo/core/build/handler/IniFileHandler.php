@@ -22,6 +22,10 @@ class IniFileHandler implements FileHandler {
     public function handleFile(File $source, File $destination, array $exclude) {
         if ($destination->exists()) {
             $ini = $this->read($destination);
+        } else {
+            $source->copy($destination);
+
+            return;
         }
 
         if (!isset($ini) || $ini === false) {
