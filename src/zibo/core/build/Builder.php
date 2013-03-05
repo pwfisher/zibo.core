@@ -3,6 +3,7 @@
 namespace zibo\core\build;
 
 use zibo\core\build\exception\BuildException;
+use zibo\core\console\output\Output;
 use zibo\core\BootstrapConfig;
 use zibo\core\Zibo;
 
@@ -38,6 +39,12 @@ class Builder {
     private $public;
 
     /**
+     * Instance of the output interface
+     * @var zibo\core\console\output\Output
+     */
+    private $output;
+
+    /**
      * Directories to exclude from the build
      * @var array
      */
@@ -53,6 +60,23 @@ class Builder {
     );
 
     /**
+     * Sets the output implementation
+     * @param zibo\core\console\output\Output $output Instance of the output
+     * @return null
+     */
+    public function setOutput(Output $output) {
+        $this->output = $output;
+    }
+
+    /**
+     * Gets the output implementation
+     * @return zibo\core\console\output\Output
+     */
+    public function getOutput() {
+        return $this->output;
+    }
+
+    /**
      * Builds your current Zibo installation into the most performant state,
      * ready for production
      * @param zibo\core\Zibo $zibo Instance of Zibo
@@ -63,9 +87,15 @@ class Builder {
      * @return null
      */
     public function build(Zibo $zibo, File $destination, $environment = 'prod', $cleanUp = true) {
+        if ($this->output) {
+            $this->output->write('Building to environment ' . $environment . ' in ' . $destination);
+        }
+
         $this->prepareDestination($destination, $cleanUp);
 
-        echo "Copying files...\n";
+        if ($this->output) {
+            $this->output->write("Copying files...");
+        }
 
         $handlers = $zibo->getDependencies('zibo\\core\\build\\handler\\DirectoryHandler');
 
@@ -103,7 +133,9 @@ class Builder {
         // copy the public directory
         $handlers[self::DEFAULT_HANDLER]->handleDirectory($fileBrowser->getPublicDirectory(), $this->public, $this->exclude);
 
-        echo "Clearing caches\n";
+        if ($this->output) {
+            $this->output->write('Clearing cache on built installation');
+        }
 
         // clear cache
         $cacheDirectory = new File($this->application, Zibo::DIRECTORY_DATA . '/' . Zibo::DIRECTORY_CACHE);
@@ -119,7 +151,10 @@ class Builder {
             }
         }
 
-        echo "Configuring the scripts\n";
+        // update the bootstrap
+        if ($this->output) {
+            $this->output->write('Updating script paths on built installation');
+        }
 
         // copy htaccess
         $htaccessFile = new File(__DIR__ . '/../../../../.htaccess');
@@ -156,6 +191,11 @@ class Builder {
 
         $config->updateScript($newConsoleFile, $configPath);
         $config->updateScript($newIndexFile, $configPath);
+
+        // update the bootstrap
+        if ($this->output) {
+            $this->output->write('Built to ' . $destination);
+        }
     }
 
     /**
@@ -176,8 +216,6 @@ class Builder {
 
             $files = $destination->read();
             if ($cleanUp && $files) {
-                echo 'Cleaned ' . $destination . "\n";
-
                 $destination->delete();
             }
         }
@@ -188,12 +226,8 @@ class Builder {
         $log = new File($this->application, 'log');
         $log->create();
 
-        echo 'Created ' . $this->application . "\n";
-
         $this->public = new File($destination, Zibo::DIRECTORY_PUBLIC);
         $this->public->create();
-
-        echo 'Created ' . $this->public . "\n";
     }
 
 }

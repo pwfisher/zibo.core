@@ -16,6 +16,10 @@
     
     <dependency interface="zibo\core\console\output\Output" class="zibo\core\console\output\PhpOutput" />
     
+    <dependency interface="zibo\core\deploy\io\DeployProfileIO" class="zibo\core\deploy\io\ConfigDeployProfileIO" id="config" />
+    
+    <dependency interface="zibo\core\deploy\type\DeployType" class="zibo\core\deploy\type\SshDeployType" id="ssh" />
+    
     <dependency interface="zibo\core\module\ModuleLoader" class="zibo\core\module\DependencyModuleLoader" id="core" />
     
     <dependency class="zibo\library\filesystem\File" id="session">

@@ -35,6 +35,7 @@ class BuildCommand extends AbstractCommand {
         $file = new File($destination);
 
         $builder = new Builder();
+        $builder->setOutput($output);
         $builder->build($this->zibo, $file, $environment);
     }
 

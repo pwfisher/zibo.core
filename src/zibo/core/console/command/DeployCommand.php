@@ -3,55 +3,17 @@
 namespace zibo\core\console\command;
 
 use zibo\core\build\Builder;
-use zibo\core\build\Deployer;
 use zibo\core\console\output\Output;
 use zibo\core\console\InputValue;
+use zibo\core\deploy\Deployer;
+use zibo\core\deploy\DeployProfile;
 
-use zibo\library\config\Config;
 use zibo\library\filesystem\File;
-
-use \Exception;
 
 /**
  * Command to deploy your installation to a remote server
  */
 class DeployCommand extends AbstractCommand {
-
-    /**
-     * Parameter prefix for a deploy profile
-     * @var string
-     */
-    const PARAM_DEPLOY = 'deploy.';
-
-    /**
-     * Parameter name of the remote server
-     * @var string
-     */
-    const PARAM_SERVER = 'server';
-
-    /**
-     * Parameter name of the remote application directory
-     * @var string
-     */
-    const PARAM_APPLICATION = 'path.application';
-
-    /**
-     * Parameter name of the remote public directory
-     * @var string
-     */
-    const PARAM_PUBLIC = 'path.public';
-
-    /**
-     * Parameter name of the environment
-     * @var string
-     */
-    const PARAM_ENVIRONMENT = 'environment';
-
-    /**
-     * Parameter name of the path to the SSH key
-     * @var string
-     */
-    const PARAM_SSH_KEY = 'ssh.key';
 
     /**
      * Constructs a new config command
@@ -72,6 +34,9 @@ class DeployCommand extends AbstractCommand {
         $destination = $input->getArgument('destination');
         $profile = $input->getArgument('profile');
 
+        $profileIO = $this->zibo->getDependency('zibo\\core\\deploy\\io\\DeployProfileIO');
+        $profile = $profileIO->readProfile($this->zibo, $profile);
+
         $environment = $this->zibo->getEnvironment()->getName();
         if ($environment == 'dev') {
             if (!$input->hasFlag('force')) {
@@ -80,33 +45,28 @@ class DeployCommand extends AbstractCommand {
                 $this->buildAndDeploy($profile, $output);
             }
         } else {
-            $params = $this->zibo->getParameter(self::PARAM_DEPLOY . $profile);
-            if (!is_array($params)) {
-                throw new Exception('Could not deploy ' . $profile . ': no profile defined');
-            }
-            $params = Config::flattenConfig($params);
-
-            $this->deploy($profile, $params, $output);
+            $this->deploy($profile, $output);
         }
     }
 
     /**
      * Builds to a temporary directory and deploys from there
-     * @param string $profile Name of the deploy profile
+     * @param zibo\core\deploy\DeployProfile $profile Deploy profile
      * @param zibo\core\console\output\Output $output
      * @return null
      */
-    protected function buildAndDeploy($profile, Output $output) {
+    protected function buildAndDeploy(DeployProfile $profile, Output $output) {
         $file = File::getTemporaryFile('build');
         $file->delete();
         $file->create();
 
         $builder = new Builder();
-        $builder->build($this->zibo, $file);
+        $builder->setOutput($output);
+        $builder->build($this->zibo, $file, $profile->getEnvironment());
 
         $phpBinary = $this->zibo->getParameter('system.binary.php', 'php');
 
-        passthru($phpBinary . ' ' . $file . '/application/console.php deploy ' . $profile);
+        passthru($phpBinary . ' ' . $file . '/application/console.php deploy ' . $profile->getName());
 
         $file->delete();
 
@@ -115,52 +75,14 @@ class DeployCommand extends AbstractCommand {
 
     /**
      * Perform deployment of this installation
-     * @param array $params
+     * @param zibo\core\deploy\DeployProfile $profile Deploy profile
+     * @param zibo\core\console\output\Output $output
      * @throws Exception
      */
-    protected function deploy($profile, $params, Output $output) {
-        if (isset($params[self::PARAM_SERVER])) {
-            $server = $params[self::PARAM_SERVER];
-            unset($params[self::PARAM_SERVER]);
-        } else {
-            throw new Exception('Could not deploy ' . $profile . ': no server parameter set');
-        }
-
-        if (isset($params[self::PARAM_APPLICATION])) {
-            $application = $params[self::PARAM_APPLICATION];
-            unset($params[self::PARAM_APPLICATION]);
-        } else {
-            throw new Exception('Could not deploy ' . $profile . ': no path.application parameter set');
-        }
-
-        if (isset($params[self::PARAM_PUBLIC])) {
-            $public = $params[self::PARAM_PUBLIC];
-            unset($params[self::PARAM_PUBLIC]);
-        } else {
-            throw new Exception('Could not deploy ' . $profile . ': no path.public parameter set');
-        }
-
-        $deployer = new Deployer($server, $application, $public);
-
-        if (isset($params[self::PARAM_ENVIRONMENT])) {
-            $environment = $params[self::PARAM_ENVIRONMENT];
-            unset($params[self::PARAM_ENVIRONMENT]);
-        } else {
-            $environment = 'prod';
-        }
-
-        $output->write('Deploying to environment ' . $environment . ' from profile ' . $profile);
-
-        if (isset($params[self::PARAM_SSH_KEY])) {
-            $deployer->setSshKey($params[self::PARAM_SSH_KEY]);
-            unset($params[self::PARAM_SSH_KEY]);
-        }
-
-        foreach ($params as $name => $value) {
-            $deployer->setParameter($name, $value);
-        }
-
-        $deployer->deploy($this->zibo, $environment);
+    protected function deploy(DeployProfile $profile, Output $output) {
+        $deployer = new Deployer();
+        $deployer->setOutput($output);
+        $deployer->deploy($this->zibo, $profile);
     }
 
 }
