@@ -144,21 +144,28 @@ class Deployer {
             $this->output->write('Synchronizing the files...');
         }
 
-        $this->type->syncFiles($this, $this->pathApplication . '/', $this->profile->getApplicationPath());
-        $this->type->syncFiles($this, $this->pathPublic . '/', $this->profile->getPublicPath());
+        $remotePathApplication = $this->profile->getApplicationPath();
+        $remotePathPublic = $this->profile->getPublicPath();
+
+        $this->type->syncFiles($this, $this->pathApplication, $remotePathApplication);
+        $this->type->syncFiles($this, $this->pathPublic, $remotePathPublic);
 
         // update the bootstrap
         if ($this->output) {
             $this->output->write('Updating script paths on remote installation');
         }
 
-        $config = $this->profile->getApplicationPath() . '/' . BootstrapConfig::SCRIPT_CONFIG;
+        $config = $remotePathApplication . '/' . BootstrapConfig::SCRIPT_CONFIG;
 
         $this->updateBootstrap($config);
 
         // update the main scripts
-        $this->updateScript(new File($this->pathPublic, 'index.php'), $this->profile->getPublicPath(). '/index.php', $config);
-        $this->updateScript(new File($this->pathApplication, 'console.php'), $this->profile->getApplicationPath() . '/console.php', $config);
+        $this->updateScript(new File($this->pathPublic, 'index.php'), $remotePathPublic. '/index.php', 'updateScript', $config);
+        $this->updateScript(new File($this->pathApplication, 'console.php'), $remotePathApplication . '/console.php', 'updateScript', $config);
+
+        // update composer autoloader scripts
+        $this->updateScript(new File($this->pathApplication, 'vendor/composer/autoload_classmap.php'), $remotePathApplication . '/vendor/composer/autoload_classmap.php', 'updateComposerScript', $remotePathApplication);
+        $this->updateScript(new File($this->pathApplication, 'vendor/composer/autoload_namespaces.php'), $remotePathApplication . '/vendor/composer/autoload_namespaces.php', 'updateComposerScript', $remotePathApplication);
 
         // post deploy actions
         if ($this->output) {
@@ -208,10 +215,11 @@ class Deployer {
      * remote server
      * @param zibo\library\filesystem\File $source Source script
      * @param string $destination Path on the remote server
-     * @param string $config Path to the new config
+     * @param string $method Name of the method to use
+     * @param string $path New path for the method
      * @return null
      */
-    protected function updateScript(File $source, $destination, $config) {
+    protected function updateScript(File $source, $destination, $method, $path) {
         if (!$source->exists()) {
             return;
         }
@@ -221,7 +229,7 @@ class Deployer {
         $source->copy($tempFile);
 
         $bootstrap = new BootstrapConfig();
-        $bootstrap->updateScript($tempFile, $config);
+        $bootstrap->$method($tempFile, $path);
 
         $this->type->copyFile($this, $tempFile->getAbsolutePath(), $destination);
 

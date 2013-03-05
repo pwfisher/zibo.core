@@ -398,4 +398,22 @@ class BootstrapConfig {
         $script->write($newContents);
     }
 
+    /**
+     * Updates the autoloader scripts from composer
+     * @param zibo\library\filesystem\File $script Composer script to modify
+     * @param string $path Path to the application directory
+     * @return null
+     * @throws Exception
+     */
+    public function updateComposerScript(File $script, $path) {
+        if ($script->isDirectory()) {
+            throw new Exception('Could not update the provided script: ' . $script . ' is a directory');
+        }
+
+        $contents = $script->read();
+        $contents = str_replace('$baseDir . \'/application', '\'' . $path, $contents);
+
+        $script->write($contents);
+    }
+
 }
