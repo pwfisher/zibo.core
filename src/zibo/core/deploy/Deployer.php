@@ -141,7 +141,7 @@ class Deployer {
 
         // sync the files
         if ($this->output) {
-            $this->output->write('Synchronizing the files...');
+            $this->output->write('Uploading the files...');
         }
 
         $remotePathApplication = $this->profile->getApplicationPath();
@@ -242,6 +242,10 @@ class Deployer {
      * @return string
      */
     public function executeLocalCommand($command) {
+        if ($this->output) {
+            $this->output->write('Invoking command: ' . $command);
+        }
+
         return passthru($command);
     }
 

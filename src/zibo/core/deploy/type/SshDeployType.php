@@ -92,7 +92,7 @@ class SshDeployType implements DeployType, RemoteConsole {
             $cmd .= '-e "ssh -i ' . $this->sshKey . '" ';
         }
 
-        $cmd .= $source . ' ';
+        $cmd .= $source . '/ ';
 
         if ($username) {
             $cmd .= $username . '@';
