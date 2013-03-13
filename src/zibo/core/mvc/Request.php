@@ -79,7 +79,7 @@ class Request extends MvcRequest {
      * @return boolean
      */
     public function hasSession() {
-        return !empty($this->session) || $this->getCookie($this->sessionCookieName);
+        return !empty($this->session) || $this->getCookie($this->sessionCookieName) || $this->getQueryParameter($this->sessionCookieName);
     }
 
     /**

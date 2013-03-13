@@ -691,6 +691,14 @@ class Request {
     }
 
     /**
+     * Gets the user agent
+     * @return string
+     */
+    public function getUserAgent() {
+        return $this->getHeader(Header::HEADER_USER_AGENT);
+    }
+
+    /**
      * Gets the if none match header
      * @return array
      */
