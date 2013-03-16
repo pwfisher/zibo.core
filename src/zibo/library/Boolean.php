@@ -6,6 +6,9 @@ use \Exception;
 
 /**
  * Boolean library
+ *
+ * Based on CommandLine utility by Patrick Fisher <patrick@pwisher.com>
+ * @see https://github.com/pwfisher/CommandLine.php
  */
 class Boolean {
 
