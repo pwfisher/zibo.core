@@ -97,6 +97,10 @@ class ArgumentParser {
      * )
      * </p>
      *
+     * parseArgs Command Line Interface (CLI) utility function.
+     * @author              Patrick Fisher <patrick@pwfisher.com>
+     * @source              https://github.com/pwfisher/CommandLine.php
+     *
      * @param array $arguments The arguments from the command line
      * @return array Parsed arguments
      */
